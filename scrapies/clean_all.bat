@@ -1,5 +1,6 @@
-call clean_boulanger.bat
-call clean_cdiscount.bat
-call clean_fnac.bat
-call clean_ldlc.bat
-call clean_materiel_net.bat
+call clean_store.bat boulanger
+call clean_store.bat cdiscount
+call clean_store.bat fnac
+call clean_store.bat ldlc
+call clean_store.bat materiel_net
+call clean_store.bat rue_du_commerce
