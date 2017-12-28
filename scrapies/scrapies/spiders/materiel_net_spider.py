@@ -35,6 +35,15 @@ class MaterielNetSpider(scrapy.Spider):
         else:
             item = Product()
 
+            categories = response.xpath('//nav[@id="breadcrumb"]//li[position() >= 3 and position() < last()]/a/text()').extract()
+            if categories:
+                for i, category in enumerate(categories):
+                    categories[i] = category.strip()
+
+            brand = response.xpath('//nav[@id="breadcrumb"]//li[2]/a/text()').extract_first()
+            if brand is not None:
+                brand = brand.strip()
+
             name = re.sub(' +', ' ', ''.join(response.xpath('//h1[@id="ProdTitle"]//text()').extract()).replace('\n', '').replace('\r', '').strip())
 
             price_old = response.xpath('//div[@id="ProdInfoPrice"]/div[' + utils.xpath_class('prixReference') + ']/text()').extract_first()
@@ -70,6 +79,9 @@ class MaterielNetSpider(scrapy.Spider):
 
             item['store'] = self.name
             item['url'] = response.url
+            item['main_category'] = "Informatique"
+            item['categories'] = categories
+            item['brand'] = brand
             item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old

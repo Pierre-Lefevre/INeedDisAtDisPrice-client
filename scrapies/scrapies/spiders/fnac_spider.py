@@ -36,6 +36,15 @@ class FnacSpider(scrapy.Spider):
         else:
             item = Product()
 
+            main_category = response.xpath('//ul[' + utils.xpath_class('f-breadcrumb') + ']/li[2]/a/text()').extract_first()
+            if main_category is not None:
+                main_category = main_category.strip()
+
+            categories = response.xpath('//ul[' + utils.xpath_class('f-breadcrumb') + ']/li[position() >= 3]/a/text()').extract()
+            if categories:
+                for i, category in enumerate(categories):
+                    categories[i] = category.strip()
+
             name = response.xpath('//h1[' + utils.xpath_class('f-productHeader-Title') + ']/text()').extract_first().strip()
             price_old = response.xpath('(//span[' + utils.xpath_class('f-priceBox-price f-priceBox-price--old') + '])[1]/text()').extract_first()
             price_cent_old = response.xpath('(//span[' + utils.xpath_class('f-priceBox-price f-priceBox-price--old') + '])[1]/sup/text()').extract_first()
@@ -73,6 +82,9 @@ class FnacSpider(scrapy.Spider):
 
             item['store'] = self.name
             item['url'] = response.url
+            item['main_category'] = main_category
+            item['categories'] = categories
+            item['brand'] = None
             item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old
