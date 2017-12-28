@@ -29,7 +29,7 @@ class MaterielNetSpider(scrapy.Spider):
             for url in urls:
                 url = self.base_url + url
                 open_ssl_hash = utils.generate_open_ssl_hash(url)
-                if len(glob.glob("data/materiel_net/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/materiel_net/img/" + open_ssl_hash + '.jpg')) != 1:
+                if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
 
         else:
@@ -95,6 +95,6 @@ class MaterielNetSpider(scrapy.Spider):
             item["nb_avis"] = nb_avis
 
             if src == self.src_no_image:
-                copyfile("data/default.jpg", "data/materiel_net/img/" + item["image_name"] + ".jpg")
+                copyfile("data/default.jpg", "data/" + self.name + "/img/" + item["image_name"] + ".jpg")
 
             yield item
