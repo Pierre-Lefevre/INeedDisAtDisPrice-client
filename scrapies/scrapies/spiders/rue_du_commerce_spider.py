@@ -2,9 +2,8 @@ import scrapy
 
 import glob
 import re
-import scrapies.utils as utils
+import scrapies.utils as u
 from scrapy.http import Request
-from shutil import copyfile
 from scrapies.items import Product
 
 
@@ -19,30 +18,32 @@ class RueDuCommerceSpider(scrapy.Spider):
     def parse(self, response):
 
         # Yield list pages.
-        x_pagination = response.xpath('//div[' + utils.xpath_class('results-header') + ']')
+        x_pagination = response.xpath('//div[' + u.x_class('results-header') + ']')
         if x_pagination:
-            url_next_page = x_pagination.xpath('.//a[' + utils.xpath_class('next') + ']/@href').extract_first()
+            url_next_page = x_pagination.xpath('.//a[' + u.x_class('next') + ']/@href').extract_first()
             if url_next_page is not None:
                 yield Request(self.base_url + url_next_page.strip(), callback=self.parse)
 
+
         # Yield product pages.
-        x_list = response.xpath('//div[' + utils.xpath_class('products list') + ']')
+        x_list = response.xpath('//div[' + u.x_class('products list') + ']')
         if x_list:
             urls = response.xpath('.//article/a/@href').extract()
             for url in urls:
                 url = self.base_url + url.strip()
-                open_ssl_hash = utils.generate_open_ssl_hash(url)
+                open_ssl_hash = u.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
 
+
         # Yield product.
-        x_product = response.xpath('//div[' + utils.xpath_class('productsheet') + ']')
+        x_product = response.xpath('//div[' + u.x_class('productsheet') + ']')
         if x_product:
             item = Product()
 
 
             # Categories
-            x_categories = response.xpath('//ol[' + utils.xpath_class('breadcrumb-chevron') + ']')
+            x_categories = response.xpath('//ol[' + u.x_class('breadcrumb-chevron') + ']')
 
             main_category = x_categories.xpath('./li[1]//span/text()').extract_first()
             if main_category is not None:
@@ -55,9 +56,9 @@ class RueDuCommerceSpider(scrapy.Spider):
 
 
             # Brand
-            x_brand_name = response.xpath('//div[' + utils.xpath_class('productDetails') + ']/h1')
+            x_brand_name = response.xpath('//div[' + u.x_class('productDetails') + ']/h1')
 
-            brand = x_brand_name.xpath('./span[' + utils.xpath_class('brand') + ']//span/text()').extract_first()
+            brand = x_brand_name.xpath('./span[' + u.x_class('brand') + ']//span/text()').extract_first()
             if brand is not None:
                 brand = brand.strip()
 
@@ -67,40 +68,40 @@ class RueDuCommerceSpider(scrapy.Spider):
 
 
             # Price
-            x_price = response.xpath('//div[' + utils.xpath_class('productBuy') + ']')
+            x_price = response.xpath('//div[' + u.x_class('productBuy') + ']')
 
-            price_old = x_price.xpath('.//div[' + utils.xpath_class('discount-prices') + ']//p[' + utils.xpath_class('price') + ']/text()').extract_first()
+            price_old = x_price.xpath('.//div[' + u.x_class('discount-prices') + ']//p[' + u.x_class('price') + ']/text()').extract_first()
             if price_old is not None:
-                price_old = utils.string_to_float(price_old[:-1].strip().replace(" ", "").replace(" ", ""))
+                price_old = u.string_to_float(price_old[:-1].strip().replace(" ", "").replace(" ", ""))
 
-            price = x_price.xpath('.//div[' + utils.xpath_class('price main') + ']/p/text()').extract_first()
-            price_cent = x_price.xpath('.//div[' + utils.xpath_class('price main') + ']/p/sup/text()').extract_first()
+            price = x_price.xpath('.//div[' + u.x_class('price main') + ']/p/text()').extract_first()
+            price_cent = x_price.xpath('.//div[' + u.x_class('price main') + ']/p/sup/text()').extract_first()
 
             currency = None
             if price is not None:
-                currency = utils.get_currency_code(price_cent[:1])
+                currency = u.get_currency_code(price_cent[:1])
 
             if price is not None:
                 if price_cent is not None:
-                    price = utils.string_to_float((price.strip() + "," + price_cent[1:].strip()).replace(" ", "").replace(" ", ""))
+                    price = u.string_to_float((price.strip() + "," + price_cent[1:].strip()).replace(" ", "").replace(" ", ""))
                 else:
-                    price = utils.string_to_float(price.strip().replace(" ", "").replace(" ", ""))
+                    price = u.string_to_float(price.strip().replace(" ", "").replace(" ", ""))
 
 
             # Image
-            src = response.xpath('//div[' + utils.xpath_class('verticalGallery') + ']//li[1]/a/@data-zoom-image').extract_first()
+            src = response.xpath('//div[' + u.x_class('verticalGallery') + ']//li[1]/a/@data-zoom-image').extract_first()
             if src is None:
-                src = response.xpath('//div[' + utils.xpath_class('verticalGallery') + ']//li[1]/a/@data-image').extract_first()
+                src = response.xpath('//div[' + u.x_class('verticalGallery') + ']//li[1]/a/@data-image').extract_first()
             if src is not None:
                 src = src.strip()
 
 
             # Avis
-            x_avis = response.xpath('//div[' + utils.xpath_class('productDetails') + ']/div[' + utils.xpath_class('productRating') + ']')
+            x_avis = response.xpath('//div[' + u.x_class('productDetails') + ']/div[' + u.x_class('productRating') + ']')
 
-            rate = x_avis.xpath('.//span[' + utils.xpath_class('icon-rating-stars') + ']/@content').extract_first()
+            rate = x_avis.xpath('.//span[' + u.x_class('icon-rating-stars') + ']/@content').extract_first()
             if rate is not None:
-                rate = utils.string_to_float(rate.strip())
+                rate = u.string_to_float(rate.strip())
 
             nb_avis = x_avis.xpath('.//span[@itemprop="reviewCount"]/text()').extract_first()
             if nb_avis is not None:
@@ -112,7 +113,7 @@ class RueDuCommerceSpider(scrapy.Spider):
             item['main_category'] = main_category
             item['categories'] = categories
             item['brand'] = brand
-            item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
+            item['openssl_hash'] = u.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old
             item['price'] = price

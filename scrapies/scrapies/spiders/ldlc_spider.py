@@ -2,9 +2,8 @@ import scrapy
 
 import glob
 import re
-import scrapies.utils as utils
+import scrapies.utils as u
 from scrapy.http import Request
-from shutil import copyfile
 from scrapies.items import Product
 
 
@@ -20,23 +19,24 @@ class LdlcSpider(scrapy.Spider):
     def parse(self, response):
 
         # Yield product pages.
-        x_list = response.xpath('//div[' + utils.xpath_class('productListing') + ']')
+        x_list = response.xpath('//div[' + u.x_class('productListing') + ']')
         if x_list:
-            urls = x_list.xpath('.//a[' + utils.xpath_class('nom') + ']/@href').extract()
+            urls = x_list.xpath('.//a[' + u.x_class('nom') + ']/@href').extract()
             for url in urls:
                 url = url.strip()
-                open_ssl_hash = utils.generate_open_ssl_hash(url)
+                open_ssl_hash = u.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
 
+
         # Yield product.
-        x_product = response.xpath('//div[' + utils.xpath_class('product') + ']')
+        x_product = response.xpath('//div[' + u.x_class('product') + ']')
         if x_product:
             item = Product()
 
 
             # Categories
-            x_categories = response.xpath('//ul[' + utils.xpath_class('cheminDeFer') + ']')
+            x_categories = response.xpath('//ul[' + u.x_class('cheminDeFer') + ']')
 
             main_category = x_categories.xpath('./li[2]/div/a/span/text()').extract_first()
             if main_category is not None:
@@ -55,28 +55,28 @@ class LdlcSpider(scrapy.Spider):
 
 
             # Name
-            name = re.sub(' +', ' ', response.xpath('//h1/span[' + utils.xpath_class('fn designation_courte') + ']/text()').extract_first().strip())
+            name = re.sub(' +', ' ', response.xpath('//h1/span[' + u.x_class('fn designation_courte') + ']/text()').extract_first().strip())
 
 
             # Price
-            x_price = response.xpath('//span[' + utils.xpath_class('blocprix') + ']')
+            x_price = response.xpath('//span[' + u.x_class('blocprix') + ']')
 
-            price_old = x_price.xpath('.//span[' + utils.xpath_class('refPrice') + ']/text()').extract_first()
+            price_old = x_price.xpath('.//span[' + u.x_class('refPrice') + ']/text()').extract_first()
             if price_old is not None:
-                price_old = utils.string_to_float(price_old[:-1].strip().replace(" ", "").replace(" ", ""))
+                price_old = u.string_to_float(price_old[:-1].strip().replace(" ", "").replace(" ", ""))
 
-            price = x_price.xpath('.//span[' + utils.xpath_class('price') + ']/text()').extract_first()
-            price_cent = x_price.xpath('.//span[' + utils.xpath_class('price') + ']/sup/text()').extract_first()
+            price = x_price.xpath('.//span[' + u.x_class('price') + ']/text()').extract_first()
+            price_cent = x_price.xpath('.//span[' + u.x_class('price') + ']/sup/text()').extract_first()
 
             currency = None
             if price is not None:
-                currency = utils.get_currency_code(price[-1:])
+                currency = u.get_currency_code(price[-1:])
 
             if price is not None:
                 if price_cent is not None:
-                    price = utils.string_to_float((price[:-1].strip() + "," + price_cent.strip()).replace(" ", "").replace(" ", ""))
+                    price = u.string_to_float((price[:-1].strip() + "," + price_cent.strip()).replace(" ", "").replace(" ", ""))
                 else:
-                    price = utils.string_to_float(price[:-1].strip().replace(" ", "").replace(" ", ""))
+                    price = u.string_to_float(price[:-1].strip().replace(" ", "").replace(" ", ""))
 
 
             # Image
@@ -84,17 +84,17 @@ class LdlcSpider(scrapy.Spider):
 
 
             # Avis
-            x_avis = response.xpath('//div[@id="productinfos"]//span[' + utils.xpath_class('rating') + ']')
+            x_avis = response.xpath('//div[@id="productinfos"]//span[' + u.x_class('rating') + ']')
 
-            rate = x_avis.xpath('./span[' + utils.xpath_class('average') + ']/text()').extract_first()
+            rate = x_avis.xpath('./span[' + u.x_class('average') + ']/text()').extract_first()
             if rate is not None:
-                rate = utils.string_to_float(rate.strip())
+                rate = u.string_to_float(rate.strip())
 
-            nb_avis = x_avis.xpath('./span[' + utils.xpath_class('votes') + ']/text()').extract_first()
+            nb_avis = x_avis.xpath('./span[' + u.x_class('votes') + ']/text()').extract_first()
             if nb_avis is not None:
                 nb_avis = int(nb_avis.strip())
 
-            max_rate = x_avis.xpath('./span[' + utils.xpath_class('best') + ']/text()').extract_first()
+            max_rate = x_avis.xpath('./span[' + u.x_class('best') + ']/text()').extract_first()
             if max_rate is not None:
                 max_rate = int(max_rate.strip())
 
@@ -104,7 +104,7 @@ class LdlcSpider(scrapy.Spider):
             item['main_category'] = main_category
             item['categories'] = categories
             item['brand'] = brand
-            item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
+            item['openssl_hash'] = u.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old
             item['price'] = price

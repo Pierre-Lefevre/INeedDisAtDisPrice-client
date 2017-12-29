@@ -2,9 +2,8 @@ import scrapy
 
 import glob
 import re
-import scrapies.utils as utils
+import scrapies.utils as u
 from scrapy.http import Request
-from shutil import copyfile
 from scrapies.items import Product
 
 
@@ -19,21 +18,23 @@ class DartySpider(scrapy.Spider):
     def parse(self, response):
 
         # Yield list pages.
-        x_pagination = response.xpath('//body[@id="darty_liste_produit"]//div[@id="main_pagination_top"]/div[' + utils.xpath_class('darty_product_list_pages_list') + ']')
+        x_pagination = response.xpath('//body[@id="darty_liste_produit"]//div[@id="main_pagination_top"]/div[' + u.x_class('darty_product_list_pages_list') + ']')
         if x_pagination:
             url_next_page = x_pagination.xpath('./a[text()="\xa0Page suivante"][last()]/@href').extract_first()
             if url_next_page is not None:
                 yield Request(self.base_url + url_next_page.strip(), callback=self.parse)
 
+
         # Yield product pages.
         x_list = response.xpath('//body[@id="darty_liste_produit"]//div[@id="main_products_list"]')
         if x_list:
-            urls = x_list.xpath('.//div[' + utils.xpath_class('infos_container') + ']/h2/a/@href').extract()
+            urls = x_list.xpath('.//div[' + u.x_class('infos_container') + ']/h2/a/@href').extract()
             for url in urls:
                 url = self.base_url + url.strip()
-                open_ssl_hash = utils.generate_open_ssl_hash(url)
+                open_ssl_hash = u.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
+
 
         # Yield product.
         x_product = response.xpath('//body[@id="page_product"]')
@@ -61,24 +62,24 @@ class DartySpider(scrapy.Spider):
 
 
             # Name
-            name = re.sub(' +', ' ', ''.join(response.xpath('//h1[' + utils.xpath_class('product_head') + ']//div[' + utils.xpath_class('product_name') + ']/span//text()').extract()).replace('\n', '').replace('\r', '').strip())
+            name = re.sub(' +', ' ', ''.join(response.xpath('//h1[' + u.x_class('product_head') + ']//div[' + u.x_class('product_name') + ']/span//text()').extract()).replace('\n', '').replace('\r', '').strip())
 
 
             # Price
-            x_price = response.xpath('//div[' + utils.xpath_class('product_infos') + ']')
+            x_price = response.xpath('//div[' + u.x_class('product_infos') + ']')
 
-            price_old = x_price.xpath('.//span[' + utils.xpath_class('darty_prix_barre_cont') + ']/span[' + utils.xpath_class('darty_prix_barre') + ']/text()').extract_first()
-            price_old_cent = x_price.xpath('.//span[' + utils.xpath_class('darty_prix_barre_cont') + ']/span[' + utils.xpath_class('darty_cents darty_prix_barre') + ']/text()').extract_first()
+            price_old = x_price.xpath('.//span[' + u.x_class('darty_prix_barre_cont') + ']/span[' + u.x_class('darty_prix_barre') + ']/text()').extract_first()
+            price_old_cent = x_price.xpath('.//span[' + u.x_class('darty_prix_barre_cont') + ']/span[' + u.x_class('darty_cents darty_prix_barre') + ']/text()').extract_first()
 
             if price_old is not None:
                 if price_old_cent is not None:
-                    price_old = utils.string_to_float((re.sub('\D', ' ', price_old.strip()) + "," + re.sub('\D', ' ', price_old_cent.strip())).replace(" ", ""))
+                    price_old = u.string_to_float((re.sub('\D', ' ', price_old.strip()) + "," + re.sub('\D', ' ', price_old_cent.strip())).replace(" ", ""))
                 else:
-                    price_old = utils.string_to_float(re.sub('\D', ' ', price_old.strip()).replace(" ", ""))
+                    price_old = u.string_to_float(re.sub('\D', ' ', price_old.strip()).replace(" ", ""))
 
             price = x_price.xpath('.//meta[@itemprop="price"]/@content').extract_first()
             if price is not None:
-                price = utils.string_to_float(price.strip())
+                price = u.string_to_float(price.strip())
 
             currency = x_price.xpath('.//meta[@itemprop="priceCurrency"]/@content').extract_first()
             if currency is not None:
@@ -86,19 +87,19 @@ class DartySpider(scrapy.Spider):
 
 
             # Image
-            src = response.xpath('//div[' + utils.xpath_class('darty_product_picture_main_pic_container') + ']/div[1]//img/@src').extract_first()
+            src = response.xpath('//div[' + u.x_class('darty_product_picture_main_pic_container') + ']/div[1]//img/@src').extract_first()
             if src is not None:
                 src = src.strip()
 
 
             # Avis
-            x_avis = response.xpath('//div[' + utils.xpath_class('bloc_reviews_resume') + ']')
+            x_avis = response.xpath('//div[' + u.x_class('bloc_reviews_resume') + ']')
 
             rate = x_avis.xpath('//meta[@itemprop="ratingValue"]/@content').extract_first()
             if rate is not None:
-                rate = utils.string_to_float(rate.strip())
+                rate = u.string_to_float(rate.strip())
 
-            max_rate = x_avis.xpath('//div[' + utils.xpath_class('bloc_reviews_note') + ']/sub/text()').extract_first()
+            max_rate = x_avis.xpath('//div[' + u.x_class('bloc_reviews_note') + ']/sub/text()').extract_first()
             if max_rate is not None:
                 max_rate = int(re.sub('\D', ' ', max_rate.strip()))
 
@@ -112,7 +113,7 @@ class DartySpider(scrapy.Spider):
             item['main_category'] = main_category
             item['categories'] = categories
             item['brand'] = brand
-            item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
+            item['openssl_hash'] = u.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old
             item['price'] = price

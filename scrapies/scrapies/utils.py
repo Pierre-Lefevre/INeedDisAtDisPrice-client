@@ -20,5 +20,6 @@ def get_currency_code(currency_symbol):
 def string_to_float(string):
     return float(string.replace(",", "."))
 
-def xpath_class(string):
+
+def x_class(string):
     return 'contains(concat(" ", normalize-space(@class), " "), " ' + string + ' ")'

@@ -2,9 +2,8 @@ import scrapy
 
 import glob
 import re
-import scrapies.utils as utils
+import scrapies.utils as u
 from scrapy.http import Request
-from shutil import copyfile
 from scrapies.items import Product
 
 
@@ -19,21 +18,23 @@ class BoulangerSpider(scrapy.Spider):
     def parse(self, response):
 
         # Yield list pages.
-        x_pagination = response.xpath('//div[' + utils.xpath_class('navigationListe') + ']')
+        x_pagination = response.xpath('//div[' + u.x_class('navigationListe') + ']')
         if x_pagination:
-            url_next_page = x_pagination.xpath('.//span[' + utils.xpath_class('navPage navPage-right') + ']/a/@href').extract_first()
+            url_next_page = x_pagination.xpath('.//span[' + u.x_class('navPage navPage-right') + ']/a/@href').extract_first()
             if url_next_page is not None:
                 yield Request(self.base_url + url_next_page.strip(), callback=self.parse)
 
+
         # Yield product pages.
-        x_list = response.xpath('//div[' + utils.xpath_class('productListe') + ']')
+        x_list = response.xpath('//div[' + u.x_class('productListe') + ']')
         if x_list:
-            urls = x_list.xpath('.//div[' + utils.xpath_class('designations') + ']/h2/a/@href').extract()
+            urls = x_list.xpath('.//div[' + u.x_class('designations') + ']/h2/a/@href').extract()
             for url in urls:
                 url = self.base_url + url.strip()
-                open_ssl_hash = utils.generate_open_ssl_hash(url)
+                open_ssl_hash = u.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
+
 
         # Yield product.
         x_product = response.xpath('//h1[@itemprop="name"]')
@@ -59,28 +60,28 @@ class BoulangerSpider(scrapy.Spider):
 
 
             # Price
-            x_info = response.xpath('//div[' + utils.xpath_class('informations') + ']')
-            x_price = x_info.xpath('.//div[' + utils.xpath_class('price') + ']')
+            x_info = response.xpath('//div[' + u.x_class('informations') + ']')
+            x_price = x_info.xpath('.//div[' + u.x_class('price') + ']')
 
-            price_old = x_price.xpath('./span[' + utils.xpath_class('productStrikeoutPrice on') + ']//span[' + utils.xpath_class('exponent') + ']/text()').extract_first()
-            price_cent_old = x_price.xpath('./span[' + utils.xpath_class('productStrikeoutPrice on') + ']//sup/span[' + utils.xpath_class('fraction') + ']/text()').extract_first()
+            price_old = x_price.xpath('./span[' + u.x_class('productStrikeoutPrice on') + ']//span[' + u.x_class('exponent') + ']/text()').extract_first()
+            price_cent_old = x_price.xpath('./span[' + u.x_class('productStrikeoutPrice on') + ']//sup/span[' + u.x_class('fraction') + ']/text()').extract_first()
             if price_old is not None:
                 if price_cent_old is not None:
-                    price_old = utils.string_to_float((price_old.strip() + "," + price_cent_old.strip()).replace(" ", ""))
+                    price_old = u.string_to_float((price_old.strip() + "," + price_cent_old.strip()).replace(" ", ""))
                 else:
-                    price_old = utils.string_to_float(price_old.strip().replace(" ", ""))
+                    price_old = u.string_to_float(price_old.strip().replace(" ", ""))
 
-            price = x_price.xpath('./p/span[' + utils.xpath_class('exponent') + ']/text()').extract_first()
-            price_cent = x_price.xpath('./p/sup/span[' + utils.xpath_class('fraction') + ']/text()').extract_first()
+            price = x_price.xpath('./p/span[' + u.x_class('exponent') + ']/text()').extract_first()
+            price_cent = x_price.xpath('./p/sup/span[' + u.x_class('fraction') + ']/text()').extract_first()
             if price is not None:
                 if price_cent is not None:
-                    price = utils.string_to_float((price.strip() + "," + price_cent.strip()).replace(" ", ""))
+                    price = u.string_to_float((price.strip() + "," + price_cent.strip()).replace(" ", ""))
                 else:
-                    price = utils.string_to_float(price.strip().replace(" ", ""))
+                    price = u.string_to_float(price.strip().replace(" ", ""))
 
             currency = x_price.xpath('./p/sup/text()').extract_first()
             if currency is not None:
-                currency = utils.get_currency_code(currency.strip())
+                currency = u.get_currency_code(currency.strip())
 
 
             # Image
@@ -90,7 +91,7 @@ class BoulangerSpider(scrapy.Spider):
 
 
             # Avis
-            x_avis = response.xpath('//div[' + utils.xpath_class('top') + ']/div[' + utils.xpath_class('right') + ']//span[' + utils.xpath_class('rating') + ']')
+            x_avis = response.xpath('//div[' + u.x_class('top') + ']/div[' + u.x_class('right') + ']//span[' + u.x_class('rating') + ']')
 
             rate = x_avis.xpath('./@class').extract_first()
             if rate is not None:
@@ -98,11 +99,11 @@ class BoulangerSpider(scrapy.Spider):
                 if rate != "0":
                     if len(rate) > 1:
                         rate = rate[:1] + "," + rate[1:]
-                    rate = utils.string_to_float(rate)
+                    rate = u.string_to_float(rate)
                 else:
                     rate = None
 
-            nb_avis = x_avis.xpath('./span[' + utils.xpath_class('link') + ']/text()').extract_first()
+            nb_avis = x_avis.xpath('./span[' + u.x_class('link') + ']/text()').extract_first()
             if nb_avis is not None:
                 nb_avis = int(re.sub('\D', '', nb_avis.strip()))
 
@@ -112,7 +113,7 @@ class BoulangerSpider(scrapy.Spider):
             item['main_category'] = main_category
             item['categories'] = categories
             item['brand'] = None
-            item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
+            item['openssl_hash'] = u.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old
             item['price'] = price

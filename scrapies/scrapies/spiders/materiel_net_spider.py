@@ -2,9 +2,8 @@ import scrapy
 
 import glob
 import re
-import scrapies.utils as utils
+import scrapies.utils as u
 from scrapy.http import Request
-from shutil import copyfile
 from scrapies.items import Product
 
 
@@ -19,7 +18,7 @@ class MaterielNetSpider(scrapy.Spider):
     def parse(self, response):
 
         # Yield list pages.
-        x_pagination = response.xpath('//ul[' + utils.xpath_class('pagination pagination-sm') + ']')
+        x_pagination = response.xpath('//ul[' + u.x_class('pagination pagination-sm') + ']')
         if x_pagination:
             url_next_page = x_pagination.xpath('./li[position() = last()]/a/@href').extract_first()
             if url_next_page is None:
@@ -27,15 +26,17 @@ class MaterielNetSpider(scrapy.Spider):
             if url_next_page is not None:
                 yield Request(self.base_url + url_next_page, callback=self.parse)
 
+
         # Yield product pages.
-        x_list = response.xpath('//table[' + utils.xpath_class('ProdList') + ']')
+        x_list = response.xpath('//table[' + u.x_class('ProdList') + ']')
         if x_list:
-            urls = x_list.xpath('.//td[' + utils.xpath_class('Photo') + ']/span/@data-href').extract()
+            urls = x_list.xpath('.//td[' + u.x_class('Photo') + ']/span/@data-href').extract()
             for url in urls:
                 url = self.base_url + url
-                open_ssl_hash = utils.generate_open_ssl_hash(url)
+                open_ssl_hash = u.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
+
 
         # Yield product.
         x_product = response.xpath('//div[@id="prod"]')
@@ -65,36 +66,36 @@ class MaterielNetSpider(scrapy.Spider):
             # Price
             x_price = response.xpath('//div[@id="ProdInfoPrice"]')
 
-            price_old = x_price.xpath('./div[' + utils.xpath_class('prixReference') + ']/text()').extract_first()
+            price_old = x_price.xpath('./div[' + u.x_class('prixReference') + ']/text()').extract_first()
             if price_old is not None:
-                price_old = utils.string_to_float(re.sub(' \D*$', '', price_old.strip()).replace(" ", ""))
+                price_old = u.string_to_float(re.sub(' \D*$', '', price_old.strip()).replace(" ", ""))
 
-            price = x_price.xpath('./span[' + utils.xpath_class('hidden') + ']/text()').extract_first()
+            price = x_price.xpath('./span[' + u.x_class('hidden') + ']/text()').extract_first()
 
             currency = None
             if price is not None:
-                currency = utils.get_currency_code(re.sub('^.*\d | [^ ]*$', '', price.strip()))
+                currency = u.get_currency_code(re.sub('^.*\d | [^ ]*$', '', price.strip()))
 
             if price is not None:
-                price = utils.string_to_float(re.sub(' \D*$', '', price.strip()).replace(" ", ""))
+                price = u.string_to_float(re.sub(' \D*$', '', price.strip()).replace(" ", ""))
 
 
             # Image
-            src = response.xpath('//div[' + utils.xpath_class('swiper-wrapper') + ']//a/@data-zoom-image').extract_first()
+            src = response.xpath('//div[' + u.x_class('swiper-wrapper') + ']//a/@data-zoom-image').extract_first()
             if src is not None:
                 src = src.strip()
 
 
             # Avis
-            x_avis = response.xpath('//div[' + utils.xpath_class('headerAvisClients') + ']')
+            x_avis = response.xpath('//div[' + u.x_class('headerAvisClients') + ']')
 
-            rate = x_avis.xpath('.//span[' + utils.xpath_class('noteUser') + ']/text()').extract_first()
+            rate = x_avis.xpath('.//span[' + u.x_class('noteUser') + ']/text()').extract_first()
             if rate is not None:
-                rate = utils.string_to_float(rate.strip())
+                rate = u.string_to_float(rate.strip())
 
-            max_rate = x_avis.xpath('.//span[' + utils.xpath_class('noteUser') + ']/following-sibling::span[1]/text()').extract_first()
+            max_rate = x_avis.xpath('.//span[' + u.x_class('noteUser') + ']/following-sibling::span[1]/text()').extract_first()
             if max_rate is not None:
-                max_rate = utils.string_to_float(max_rate.strip())
+                max_rate = u.string_to_float(max_rate.strip())
 
             nb_avis = x_avis.xpath('.//span[@id="avisCount"]/span/text()').extract_first()
             if nb_avis is not None:
@@ -106,7 +107,7 @@ class MaterielNetSpider(scrapy.Spider):
             item['main_category'] = "Informatique"
             item['categories'] = categories
             item['brand'] = brand
-            item['openssl_hash'] = utils.generate_open_ssl_hash(item['url'])
+            item['openssl_hash'] = u.generate_open_ssl_hash(item['url'])
             item['name'] = name
             item['price_old'] = price_old
             item['price'] = price
