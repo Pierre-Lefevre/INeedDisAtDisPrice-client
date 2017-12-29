@@ -15,42 +15,61 @@ class MaterielNetSpider(scrapy.Spider):
     start_urls = [
         base_url + '/pc-portable/?p=1'
     ]
-    src_no_image = "src-no-image"
 
     def parse(self, response):
-        url_next_page = response.xpath('//ul[' + utils.xpath_class('pagination pagination-sm') + ']/li[position() = last()]/a/@href').extract_first()
-        if url_next_page is None:
-            url_next_page = response.xpath('//ul[' + utils.xpath_class('pagination pagination-sm') + ']/li[position() = (last() - 1)]/a/@href').extract_first()
-        if url_next_page is not None:
-            yield Request(self.base_url + url_next_page, callback=self.parse)
 
-        if not response.xpath('//h1[@id="ProdTitle"]/text()').extract():
-            urls = response.xpath('//table[' + utils.xpath_class('ProdList') + ']//td[' + utils.xpath_class('Photo') + ']/span/@data-href').extract()
+        # Yield list pages.
+        x_pagination = response.xpath('//ul[' + utils.xpath_class('pagination pagination-sm') + ']')
+        if x_pagination:
+            url_next_page = x_pagination.xpath('./li[position() = last()]/a/@href').extract_first()
+            if url_next_page is None:
+                url_next_page = x_pagination.xpath('./li[position() = (last() - 1)]/a/@href').extract_first()
+            if url_next_page is not None:
+                yield Request(self.base_url + url_next_page, callback=self.parse)
+
+        # Yield product pages.
+        x_list = response.xpath('//table[' + utils.xpath_class('ProdList') + ']')
+        if x_list:
+            urls = x_list.xpath('.//td[' + utils.xpath_class('Photo') + ']/span/@data-href').extract()
             for url in urls:
                 url = self.base_url + url
                 open_ssl_hash = utils.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
 
-        else:
+        # Yield product.
+        x_product = response.xpath('//div[@id="prod"]')
+        if x_product:
             item = Product()
 
-            categories = response.xpath('//nav[@id="breadcrumb"]//li[position() >= 3 and position() < last()]/a/text()').extract()
+
+            # Categories
+            x_categories = response.xpath('//nav[@id="breadcrumb"]')
+
+            categories = x_categories.xpath('.//li[position() >= 3 and position() < last()]/a/text()').extract()
             if categories:
                 for i, category in enumerate(categories):
                     categories[i] = category.strip()
 
-            brand = response.xpath('//nav[@id="breadcrumb"]//li[2]/a/text()').extract_first()
+
+            # Brand
+            brand = x_categories.xpath('.//li[2]/a/text()').extract_first()
             if brand is not None:
                 brand = brand.strip()
 
+
+            # Name
             name = re.sub(' +', ' ', ''.join(response.xpath('//h1[@id="ProdTitle"]//text()').extract()).replace('\n', '').replace('\r', '').strip())
 
-            price_old = response.xpath('//div[@id="ProdInfoPrice"]/div[' + utils.xpath_class('prixReference') + ']/text()').extract_first()
+
+            # Price
+            x_price = response.xpath('//div[@id="ProdInfoPrice"]')
+
+            price_old = x_price.xpath('./div[' + utils.xpath_class('prixReference') + ']/text()').extract_first()
             if price_old is not None:
                 price_old = utils.string_to_float(re.sub(' \D*$', '', price_old.strip()).replace(" ", ""))
 
-            price = response.xpath('//div[@id="ProdInfoPrice"]/span[' + utils.xpath_class('hidden') + ']/text()').extract_first()
+            price = x_price.xpath('./span[' + utils.xpath_class('hidden') + ']/text()').extract_first()
 
             currency = None
             price_info = None
@@ -61,21 +80,28 @@ class MaterielNetSpider(scrapy.Spider):
             if price is not None:
                 price = utils.string_to_float(re.sub(' \D*$', '', price.strip()).replace(" ", ""))
 
-            src = response.xpath('//div[' + utils.xpath_class('swiper-wrapper') + ']//a/@data-zoom-image').extract_first().strip()
 
-            rate_path = response.xpath('//div[' + utils.xpath_class('headerAvisClients') + ']//span[' + utils.xpath_class('noteUser') + ']')
+            # Image
+            src = response.xpath('//div[' + utils.xpath_class('swiper-wrapper') + ']//a/@data-zoom-image').extract_first()
+            if src is not None:
+                src = src.strip()
 
-            rate = rate_path.xpath('text()').extract_first()
+
+            # Avis
+            x_avis = response.xpath('//div[' + utils.xpath_class('headerAvisClients') + ']')
+
+            rate = x_avis.xpath('.//span[' + utils.xpath_class('noteUser') + ']/text()').extract_first()
             if rate is not None:
                 rate = utils.string_to_float(rate.strip())
 
-            max_rate = rate_path.xpath('following-sibling::span[1]/text()').extract_first()
+            max_rate = x_avis.xpath('.//span[' + utils.xpath_class('noteUser') + ']/following-sibling::span[1]/text()').extract_first()
             if max_rate is not None:
                 max_rate = utils.string_to_float(max_rate.strip())
 
-            nb_avis = response.xpath('//span[@id="avisCount"]/span/text()').extract_first()
+            nb_avis = x_avis.xpath('.//span[@id="avisCount"]/span/text()').extract_first()
             if nb_avis is not None:
-                nb_avis = utils.string_to_float(nb_avis.strip())
+                nb_avis = int(nb_avis.strip())
+
 
             item['store'] = self.name
             item['url'] = response.url
@@ -94,7 +120,5 @@ class MaterielNetSpider(scrapy.Spider):
             item["max_rate"] = max_rate
             item["nb_avis"] = nb_avis
 
-            if src == self.src_no_image:
-                copyfile("data/default.jpg", "data/" + self.name + "/img/" + item["image_name"] + ".jpg")
 
             yield item

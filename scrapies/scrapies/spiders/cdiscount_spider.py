@@ -15,67 +15,92 @@ class CdiscountSpider(scrapy.Spider):
     start_urls = [
         base_url + '/informatique/ordinateurs-pc-portables/pc-portables/l-1070992.html'
     ]
-    src_no_image = "src-no-image"
-    nb_page = None
+    first = True
 
     def parse(self, response):
 
-        if self.nb_page is None:
-            self.nb_page = response.xpath('//ul[@id="PaginationForm_ul"]/li[last()]/a/text()').extract_first()
-            if self.nb_page is not None:
-                self.nb_page = self.nb_page.strip()
-                for x in range(1, int(self.nb_page)):
-                    yield Request(self.base_url + "/informatique/ordinateurs-pc-portables/pc-portables/l-1070992-" + str(x) + ".html", callback=self.parse)
+        # Yield list pages.
+        x_pagination = response.xpath('//ul[@id="PaginationForm_ul"]')
+        if x_pagination and self.first:
+            self.first = False
+            nb_page = x_pagination.xpath('./li[last()]/a/text()').extract_first()
+            if nb_page is not None:
+                for x in range(1, int(nb_page.strip())):
+                    yield Request(response.url[:-5] + "-" + str(x) + response.url[-5:], callback=self.parse)
 
-        if not response.xpath('//h1[@itemprop="name"]/text()').extract():
-            urls = response.xpath('//ul[@id="lpBloc"]//div[' + utils.xpath_class('prdtBloc') + ']/a/@href').extract()
+        # Yield product pages.
+        x_list = response.xpath('//ul[@id="lpBloc"]')
+        if x_list:
+            urls = x_list.xpath('.//div[' + utils.xpath_class('prdtBloc') + ']/a/@href').extract()
             for url in urls:
                 url = url.strip()
                 open_ssl_hash = utils.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
 
-        else:
+        # Yield product.
+        x_product = response.xpath('//h1[@itemprop="name"]')
+        if x_product:
             item = Product()
 
-            main_category = response.xpath('//div[@id="bc"]//li[3]//span/text()').extract_first()
+            # Categories
+            x_categories = response.xpath('//div[@id="bc"]')
+
+            main_category = x_categories.xpath('.//li[3]//span/text()').extract_first()
             if main_category is not None:
                 main_category = main_category.strip()
 
-            categories = response.xpath('//div[@id="bc"]//li[position() >= 4 and position() < last()]//span/text()').extract()
+            categories = x_categories.xpath('.//li[position() >= 4 and position() < last()]//span/text()').extract()
             if categories:
                 for i, category in enumerate(categories):
                     categories[i] = category.strip()
 
+
+            # Brand
             brand = response.xpath('//table[' + utils.xpath_class('fpDescTb fpDescTbPub') + ']//span[@itemprop="brand"]//span[@itemprop="name"]/text()').extract_first()
             if brand is not None:
                 brand = brand.strip()
 
-            name = re.sub(' +', ' ', response.xpath('//h1[@itemprop="name"]/text()').extract_first().strip())
 
-            price_old = response.xpath('//div[@id="fpBlocPrice"]//span[' + utils.xpath_class('fpStriked') + ']/text()').extract_first()
+            # Name
+            name = re.sub(' +', ' ', x_product.xpath('./text()').extract_first().strip())
+
+
+            # Price
+            x_price = response.xpath('//div[@id="fpBlocPrice"]')
+
+            price_old = x_price.xpath('.//span[' + utils.xpath_class('fpStriked') + ']/text()').extract_first()
             if price_old is not None:
                 price_old = utils.string_to_float(re.sub(' .*$', '', price_old.strip()).replace(" ", ""))
 
-            price = response.xpath('//div[@id="fpBlocPrice"]//span[' + utils.xpath_class('fpPrice price jsMainPrice jsProductPrice') + ']/@content').extract_first()
+            price = x_price.xpath('.//span[' + utils.xpath_class('fpPrice price jsMainPrice jsProductPrice') + ']/@content').extract_first()
             if price is not None:
                 price = utils.string_to_float(price.strip().replace(" ", ""))
 
-            currency = response.xpath('//div[@id="fpBlocPrice"]//meta[@itemprop="priceCurrency"]/@content').extract_first()
+            currency = x_price.xpath('.//meta[@itemprop="priceCurrency"]/@content').extract_first()
             if price is not None:
                 currency = currency.strip()
 
+
+            # Image
             src = response.xpath('//div[' + utils.xpath_class('fpMainImg') + ']/a[@itemprop="image"]/@href').extract_first().strip()
 
-            rate_path = response.xpath('//div[' + utils.xpath_class('topMainRating') + ']')
 
-            rate = rate_path.xpath('//span[@itemprop="ratingValue"]/text()').extract_first()
+            # Avis
+            x_avis = response.xpath('//div[' + utils.xpath_class('topMainRating') + ']')
+
+            rate = x_avis.xpath('//span[@itemprop="ratingValue"]/text()').extract_first()
             if rate is not None:
                 rate = utils.string_to_float(rate.strip())
 
-            nb_avis = rate_path.xpath('//span[@itemprop="ratingCount"]/text()').extract_first()
+            nb_avis = x_avis.xpath('//span[@itemprop="ratingCount"]/text()').extract_first()
             if nb_avis is not None:
                 nb_avis = int(nb_avis.strip())
+
+            max_rate = response.xpath('//a[' + utils.xpath_class('fpCusto') + ']/text()').extract_first()
+            if max_rate is not None:
+                max_rate = int(re.sub('^[^\/]*\/', '', max_rate.strip()))
+
 
             item['store'] = self.name
             item['url'] = response.url
@@ -91,10 +116,8 @@ class CdiscountSpider(scrapy.Spider):
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate
-            item["max_rate"] = 5
+            item["max_rate"] = max_rate
             item["nb_avis"] = nb_avis
 
-            if src == self.src_no_image:
-                copyfile("data/default.jpg", "data/" + self.name + "/img/" + item["image_name"] + ".jpg")
 
             yield item

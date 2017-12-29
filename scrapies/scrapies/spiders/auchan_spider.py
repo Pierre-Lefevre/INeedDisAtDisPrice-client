@@ -15,70 +15,98 @@ class AuchanSpider(scrapy.Spider):
     start_urls = [
         base_url + '/informatique/ordinateur-portable/c-7638110'
     ]
-    src_no_image = "src-no-image"
-    nb_page = None
 
     def parse(self, response):
 
-        url_next_page = response.xpath('//nav[' + utils.xpath_class('ui-pagination') + ']//a[' + utils.xpath_class('ui-pagination--next') + ']/@href').extract_first()
-        if url_next_page is not None:
-            url_next_page = self.base_url + url_next_page.strip()
-            yield Request(url_next_page, callback=self.parse)
+        # Yield list pages.
+        x_pagination = response.xpath('//nav[' + utils.xpath_class('ui-pagination') + ']')
+        if x_pagination:
+            url_next_page = x_pagination.xpath('.//a[' + utils.xpath_class('ui-pagination--next') + ']/@href').extract_first()
+            if url_next_page is not None:
+                yield Request(self.base_url + url_next_page.strip(), callback=self.parse)
 
-        if not response.xpath('//h1[' + utils.xpath_class('product-detail--title') + ']/text()').extract():
-            urls = response.xpath('//div[' + utils.xpath_class('product-list--container') + ']//div[' + utils.xpath_class('product-item--wrapper') + ']/a/@href').extract()
+        # Yield product pages.
+        x_list = response.xpath('//div[' + utils.xpath_class('product-list--container') + ']')
+        if x_list:
+            urls = x_list.xpath('.//div[' + utils.xpath_class('product-item--wrapper') + ']/a/@href').extract()
             for url in urls:
                 url = self.base_url + url.strip()
                 open_ssl_hash = utils.generate_open_ssl_hash(url)
                 if len(glob.glob("data/" + self.name + "/json/" + open_ssl_hash + '.json')) != 1 or len(glob.glob("data/" + self.name + "/img/" + open_ssl_hash + '.jpg')) != 1:
                     yield Request(url, callback=self.parse)
 
-        else:
+        # Yield product.
+        x_product = response.xpath('//div[' + utils.xpath_class('product-detail') + ']')
+        if x_product:
             item = Product()
 
-            main_category = response.xpath('//div[' + utils.xpath_class('ui-breadcrumb--scroller') + ']/nav/span[2]/meta[@itemprop="name"]/@content').extract_first()
+
+            # Categories
+            x_categories = response.xpath('//div[' + utils.xpath_class('ui-breadcrumb--scroller') + ']/nav')
+
+            main_category = x_categories.xpath('./span[2]/meta[@itemprop="name"]/@content').extract_first()
             if main_category is not None:
                 main_category = main_category.strip()
 
-            categories = response.xpath('//div[' + utils.xpath_class('ui-breadcrumb--scroller') + ']/nav/span[position() >= 3 and position() < last()]/meta[@itemprop="name"]/@content').extract()
+            categories = x_categories.xpath('./span[position() >= 3 and position() < last()]/meta[@itemprop="name"]/@content').extract()
             if categories:
                 for i, category in enumerate(categories):
                     categories[i] = category.strip()
 
-            brand = response.xpath('//div[' + utils.xpath_class('product-detail--wrapper') + ']/meta[@itemprop="brand"]/@content').extract_first()
+
+            # Brand
+            x_brand_name = response.xpath('//div[' + utils.xpath_class('product-detail--wrapper') + ']')
+
+            brand = x_brand_name.xpath('./meta[@itemprop="brand"]/@content').extract_first()
             if brand is not None:
                 brand = brand.strip()
 
-            name = response.xpath('//div[' + utils.xpath_class('product-detail--wrapper') + ']/h1[' + utils.xpath_class('product-detail--title') + ']/text()').extract_first().replace('\n', '').replace('\r', '').strip()
 
-            price_old = response.xpath('//div[' + utils.xpath_class('pricesBlock') + ']//del[' + utils.xpath_class('product-price--oldPrice') + ']/text()').extract_first()
+            # Name
+            name = x_brand_name.xpath('./h1[' + utils.xpath_class('product-detail--title') + ']/text()').extract_first().replace('\n', '').replace('\r', '').strip()
+
+
+            # Price
+            x_price = response.xpath('//div[' + utils.xpath_class('pricesBlock') + ']')
+
+            price_old = x_price.xpath('.//del[' + utils.xpath_class('product-price--oldPrice') + ']/text()').extract_first()
             if price_old is not None:
                 price_old = utils.string_to_float(re.sub(' [^ ]*$', '', price_old.strip()).replace(" ", "").replace(" ", ""))
 
-            price = response.xpath('//div[' + utils.xpath_class('pricesBlock') + ']//meta[@itemprop="price"]/@content').extract_first()
+            price = x_price.xpath('.//meta[@itemprop="price"]/@content').extract_first()
             if price is not None:
                 price = utils.string_to_float(price.strip())
 
-            currency = response.xpath('//div[' + utils.xpath_class('pricesBlock') + ']//meta[@itemprop="priceCurrency"]/@content').extract_first()
+            currency = x_price.xpath('.//meta[@itemprop="priceCurrency"]/@content').extract_first()
             if currency is not None:
                 currency = currency.strip()
-        # #
-        # #     price_info = response.xpath('//span[' + utils.xpath_class('blocprix') + ']//span[' + utils.xpath_class('price') + ']/following::span[' + utils.xpath_class('tax') + '][1]/text()').extract_first()
-        # #     if price_info is not None:
-        # #         price_info = price_info.strip()
-        # #
+
+            price_infos = x_price.xpath('./span[' + utils.xpath_class('product-price--taxes') + ']/text()').extract()
+            if price_infos:
+                for i, price_info in enumerate(price_infos):
+                    price_infos[i] = price_info.strip()
+
+
+            # Image
             src = response.xpath('//div[' + utils.xpath_class('x-scroller') + ']/label[1]//img/@src').extract_first()
             if src is not None:
                 src = src.strip()
 
-            rate_path = response.xpath('//div[' + utils.xpath_class('product-detail--rating') + ']')
-            rate = rate_path.xpath('//meta[@itemprop="ratingValue"]/@content').extract_first()
+
+            # Avis
+            x_avis = response.xpath('//div[' + utils.xpath_class('product-detail--rating') + ']')
+
+            rate = x_avis.xpath('.//meta[@itemprop="ratingValue"]/@content').extract_first()
             if rate is not None:
                 rate = utils.string_to_float(rate.strip())
 
-            nb_avis = rate_path.xpath('//meta[@itemprop="reviewCount"]/@content').extract_first()
+            nb_avis = x_avis.xpath('.//meta[@itemprop="reviewCount"]/@content').extract_first()
             if nb_avis is not None:
                 nb_avis = int(nb_avis.strip())
+
+            max_rate = x_avis.xpath('.//span[' + utils.xpath_class('ui-rating--background') + ']/i[' + utils.xpath_class('icon-auchan-82') + ']').extract()
+            max_rate = len(max_rate) if max_rate else None
+
 
             item['store'] = self.name
             item['url'] = response.url
@@ -90,14 +118,12 @@ class AuchanSpider(scrapy.Spider):
             item['price_old'] = price_old
             item['price'] = price
             item['currency'] = currency
-            item['price_info'] = None
+            item['price_info'] = price_infos
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate
-            item["max_rate"] = 5
+            item["max_rate"] = max_rate
             item["nb_avis"] = nb_avis
 
-            if src == self.src_no_image:
-                copyfile("data/default.jpg", "data/" + self.name + "/img/" + item["image_name"] + ".jpg")
 
             yield item
