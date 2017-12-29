@@ -82,13 +82,6 @@ class BoulangerSpider(scrapy.Spider):
             if currency is not None:
                 currency = utils.get_currency_code(currency.strip())
 
-            price_infos = []
-            price_info_1 = x_info.xpath('.//div[' + utils.xpath_class('pb-left') + ']/div[' + utils.xpath_class('financing') + ']//text()').extract()
-            if price_info_1 is not None:
-                price_infos.append(''.join(price_info_1).replace('\n', '').replace('\r', '').strip())
-            if len(price_infos) == 0:
-                price_infos = None
-
 
             # Image
             src = response.xpath('//span[@itemprop="gtin13"]/text()').extract_first().strip()
@@ -124,7 +117,6 @@ class BoulangerSpider(scrapy.Spider):
             item['price_old'] = price_old
             item['price'] = price
             item['currency'] = currency
-            item['price_info'] = price_infos
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate

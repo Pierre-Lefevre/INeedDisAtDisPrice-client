@@ -78,10 +78,6 @@ class LdlcSpider(scrapy.Spider):
                 else:
                     price = utils.string_to_float(price[:-1].strip().replace(" ", "").replace(" ", ""))
 
-            price_info = x_price.xpath('.//span[' + utils.xpath_class('price') + ']/following::span[' + utils.xpath_class('tax') + '][1]/text()').extract_first()
-            if price_info is not None:
-                price_info = price_info.strip()
-
 
             # Image
             src = response.xpath('//img[@id="ctl00_cphMainContent_ImgProduct"]/@src').extract_first().strip()
@@ -113,7 +109,6 @@ class LdlcSpider(scrapy.Spider):
             item['price_old'] = price_old
             item['price'] = price
             item['currency'] = currency
-            item['price_info'] = price_info
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate

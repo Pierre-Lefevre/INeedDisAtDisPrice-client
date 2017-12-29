@@ -72,10 +72,8 @@ class MaterielNetSpider(scrapy.Spider):
             price = x_price.xpath('./span[' + utils.xpath_class('hidden') + ']/text()').extract_first()
 
             currency = None
-            price_info = None
             if price is not None:
                 currency = utils.get_currency_code(re.sub('^.*\d | [^ ]*$', '', price.strip()))
-                price_info = re.sub('^.* ', '', price.strip())
 
             if price is not None:
                 price = utils.string_to_float(re.sub(' \D*$', '', price.strip()).replace(" ", ""))
@@ -113,7 +111,6 @@ class MaterielNetSpider(scrapy.Spider):
             item['price_old'] = price_old
             item['price'] = price
             item['currency'] = currency
-            item['price_info'] = price_info
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate

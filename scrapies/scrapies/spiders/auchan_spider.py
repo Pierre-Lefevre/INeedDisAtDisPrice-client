@@ -81,11 +81,6 @@ class AuchanSpider(scrapy.Spider):
             if currency is not None:
                 currency = currency.strip()
 
-            price_infos = x_price.xpath('./span[' + utils.xpath_class('product-price--taxes') + ']/text()').extract()
-            if price_infos:
-                for i, price_info in enumerate(price_infos):
-                    price_infos[i] = price_info.strip()
-
 
             # Image
             src = response.xpath('//div[' + utils.xpath_class('x-scroller') + ']/label[1]//img/@src').extract_first()
@@ -118,7 +113,6 @@ class AuchanSpider(scrapy.Spider):
             item['price_old'] = price_old
             item['price'] = price
             item['currency'] = currency
-            item['price_info'] = price_infos
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate

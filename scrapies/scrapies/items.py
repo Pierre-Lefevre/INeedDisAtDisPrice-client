@@ -25,7 +25,6 @@ class Product(scrapy.Item):
     price_old = scrapy.Field()
     price = scrapy.Field()
     currency = scrapy.Field()
-    price_info = scrapy.Field()
     image_urls = scrapy.Field()
     image_name = scrapy.Field()
     images = scrapy.Field()

@@ -112,7 +112,6 @@ class CdiscountSpider(scrapy.Spider):
             item['price_old'] = price_old
             item['price'] = price
             item['currency'] = currency
-            item['price_info'] = None
             item["image_urls"] = [src]
             item["image_name"] = item['openssl_hash']
             item["rate"] = rate
