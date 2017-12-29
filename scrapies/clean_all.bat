@@ -1,3 +1,4 @@
+call clean_store.bat auchan
 call clean_store.bat boulanger
 call clean_store.bat cdiscount
 call clean_store.bat darty
