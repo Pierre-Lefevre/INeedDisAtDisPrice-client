@@ -1,6 +1,5 @@
+import './accounts';
+import '../both/api';
 import './api';
-import { Meteor } from 'meteor/meteor';
-
-Meteor.startup(() => {
-
-});
+import './fixtures';
+import './email';

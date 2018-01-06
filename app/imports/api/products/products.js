@@ -1,7 +1,20 @@
+/* eslint-disable consistent-return */
+
 import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
-class ProductsCollection extends Mongo.Collection {
+const Products = new Mongo.Collection('products');
 
-}
+Products.allow({
+  insert: () => false,
+  update: () => false,
+  remove: () => false,
+});
 
-export const Products = new ProductsCollection('products');
+Products.deny({
+  insert: () => true,
+  update: () => true,
+  remove: () => true,
+});
+
+export default Products;

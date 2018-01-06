@@ -1,7 +1,10 @@
-import { Meteor } from 'meteor/meteor';
+import React from 'react';
 import { render } from 'react-dom';
-import { renderRoutes } from './routes.jsx';
+import { Meteor } from 'meteor/meteor';
+import App from '../../ui/layouts/App/App';
+import '../both/api';
+import { IntlProvider } from 'react-intl';
 
-Meteor.startup(() => {
-  render(renderRoutes(), document.getElementById('app'));
-});
+import '../../ui/stylesheets/app.scss';
+
+Meteor.startup(() => render(<IntlProvider locale="fr"><App /></IntlProvider>, document.getElementById('react-root')));

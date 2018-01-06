@@ -1,11 +1,13 @@
-import { Meteor } from 'meteor/meteor'
-import { Mongo } from 'meteor/mongo'
-import { check } from 'meteor/check'
-import { Products } from '../products'
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import Products from '../Products';
 
-Meteor.publish('products.list', () => Products.find())
+Meteor.publish('products', function documents() {
+  return Products.find();
+});
 
-Meteor.publish('products.view', (_id) => {
-  check(_id, String)
-  return Products.find({_id: new Mongo.ObjectID(_id)})
-})
+// Note: documents.view is also used when editing an existing document.
+Meteor.publish('products.view', function documentsView(productId) {
+  check(productId, String);
+  return Products.find({ _id: new Mongo.ObjectID(productId) });
+});
