@@ -5,7 +5,7 @@ import moment from 'moment'
 import 'moment/locale/fr'
 import { FormattedNumber } from 'react-intl'
 
-import './ViewProduct.css'
+import './Product.css'
 
 const data = [
   {name: '10/12/2017', price: 4000, currency: 'EUR'},
@@ -33,7 +33,7 @@ class CustomTooltip extends React.Component {
   }
 }
 
-export default class Index extends React.Component {
+export default class Product extends React.Component {
   constructor (props) {
     super(props)
     this.state = {product: null}
@@ -44,7 +44,7 @@ export default class Index extends React.Component {
   }
 
   Product () {
-    axios.get('http://127.0.0.1:3333/api/product/' + this.props.match.params.id)
+    axios.get('http://localhost:4242/api/product/' + this.props.match.params.id)
       .then(res => {
         this.setState({product: res.data})
       })

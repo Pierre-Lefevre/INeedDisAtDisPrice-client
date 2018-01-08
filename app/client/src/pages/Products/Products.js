@@ -1,12 +1,11 @@
 import React from 'react'
-import logo from './logo.svg'
 import axios from 'axios'
-import { codeToSymbol } from './currency-utils'
+import { codeToSymbol } from '../../modules/currency-utils'
 import { Link } from 'react-router-dom'
 
-import './ProductsList.css'
+import './Products.css'
 
-export default class ProductsList extends React.Component {
+export default class Products extends React.Component {
   constructor (props) {
     super(props)
 
@@ -18,7 +17,7 @@ export default class ProductsList extends React.Component {
   }
 
   ProductsList () {
-    axios.get('http://127.0.0.1:3333/api/products')
+    axios.get('http://localhost:4242/api/products')
       .then(res => {
         this.setState({products: res.data})
       })
@@ -45,12 +44,9 @@ export default class ProductsList extends React.Component {
     return (<div>
         <div className="App">
           <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo"/>
-            <h1 className="App-title">Welcome to React</h1>
+            <img src="/svg/logo.svg" className="App-logo" alt="logo"/>
+            <h1 className="App-title">I Need Dis At Dis Price</h1>
           </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload.
-          </p>
         </div>
         <ul id="products-list">{persons}</ul>
       </div>

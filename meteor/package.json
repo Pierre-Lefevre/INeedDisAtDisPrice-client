@@ -1,6 +1,11 @@
 {
-  "name": "pup",
+  "name": "i-need-dis-at-dis-price-meteor",
+  "version": "1.0.0",
   "private": true,
+  "author": {
+    "name": "Pierre Lefèvre",
+    "email": "lefevre.pierre.m.d@gmail.com"
+  },
   "scripts": {
     "start": "meteor --settings settings-development.json",
     "prettify": "prettier --single-quote --trailing-comma all --write imports/ui/pages/{Products,ViewProduct}/**/*.{js,jsx}",

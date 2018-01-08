@@ -1,10 +1,10 @@
-var path = require('path')
+const path = require('path')
 
 module.exports = {
   entry: './src/index.js',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, './src')
+    path: path.resolve(__dirname, './src/bundle')
   },
   module: {
     rules: [
@@ -19,19 +19,17 @@ module.exports = {
         }
       },
       {
-        test: /\.s?css$/,
+        test: /\.css$/,
         use: [{
           loader: 'style-loader'
         }, {
           loader: 'css-loader'
-        }, {
-          loader: 'sass-loader'
-        }],
+        }]
       },
       {
-        test: /\.svg$/,
+        test: /\.(jpe?g|png|svg)$/,
         use: {
-          loader: 'svg-inline-loader'
+          loader: "file-loader"
         }
       }
     ]
