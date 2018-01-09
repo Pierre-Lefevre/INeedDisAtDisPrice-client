@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import moment from 'moment'
 import 'moment/locale/fr'
 import { FormattedNumber } from 'react-intl'
+import Loader from '../../components/Loader/Loader'
 
 import './Product.css'
 
@@ -53,56 +54,57 @@ export default class Product extends React.Component {
   render () {
     if (this.state.product) {
       let product = this.state.product
-      return (<div>
-        <div id="product">
-          <div id="product-img">
-            <img
-              src={'/img/products/' + product.image_name + '.jpg'}
-              alt={product.name}
-            />
-          </div>
-          <div id="product-info">
-            <div className="product-name">
-              <h1>{product.name}</h1>
+      return (
+        <main>
+          <div id="product">
+            <div id="product-img">
+              <img
+                src={'/img/products/' + product.image_name + '.jpg'}
+                alt={product.name}
+              />
             </div>
-            <div className="product-price">
-              <FormattedNumber value={product.price} style="currency" currency={product.currency}/>
-            </div>
-            <div className="product-avis">
-              {!product.nb_avis ? (<span>Aucun avis</span>) : (<span>{product.rate}/{product.max_rate} ({product.nb_avis} avis)</span>)}
-            </div>
-          </div>
-          <div id="product-price-chart">
-            <ResponsiveContainer>
-              <LineChart data={data}>
-                <Line dataKey="price" stroke="#FF6600" activeDot={{r: 6}}/>
-                <CartesianGrid stroke="#ccc" strokeDasharray="3 3"/>
-                <XAxis tick={false} stroke="#ccc"/>
-                <YAxis stroke="#ccc" domain={['auto', 'auto']}/>
-                <Tooltip content={<CustomTooltip/>}/>
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div id="stores">
-          <h2>Disponible sur :</h2>
-          <ul>
-            <li>
-              <div className="store-logo">
-                <img
-                  src={'/img/stores/logos/' + product.store + '.png'}
-                  alt={product.store}
-                />
+            <div id="product-info">
+              <div className="product-name">
+                <h1>{product.name}</h1>
               </div>
-              <div className="store-product-avis">{!product.nb_avis ? (<span>Aucun avis</span>) : (<span>{product.rate}/{product.max_rate} ({product.nb_avis} avis)</span>)}</div>
-              <div className="store-product-name"><h3>{product.name}</h3></div>
-              <div className="store-product-price"><span className="price"><FormattedNumber value={product.price} style="currency" currency={product.currency}/></span></div>
-              <div className="store-product-link"><a href={product.url} target="_blank">Voir l'offre</a></div>
-            </li>
-          </ul>
-        </div>
-      </div>)
+              <div className="product-price price">
+                <FormattedNumber value={product.price} style="currency" currency={product.currency}/>
+              </div>
+              <div className="product-avis">
+                {!product.nb_avis ? (<span>Aucun avis</span>) : (<span>{product.rate}/{product.max_rate} ({product.nb_avis} avis)</span>)}
+              </div>
+            </div>
+            <div id="product-price-chart">
+              <ResponsiveContainer>
+                <LineChart data={data}>
+                  <Line dataKey="price" stroke="#FF6600" activeDot={{r: 6}}/>
+                  <CartesianGrid stroke="#ccc" strokeDasharray="3 3"/>
+                  <XAxis tick={false} stroke="#ccc"/>
+                  <YAxis stroke="#ccc" domain={['auto', 'auto']}/>
+                  <Tooltip content={<CustomTooltip/>}/>
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div id="stores">
+            <h2>Disponible sur :</h2>
+            <ul>
+              <li>
+                <div className="store-logo">
+                  <img
+                    src={'/img/stores/logos/' + product.store + '.png'}
+                    alt={product.store}
+                  />
+                </div>
+                <div className="store-product-avis">{!product.nb_avis ? (<span>Aucun avis</span>) : (<span>{product.rate}/{product.max_rate} ({product.nb_avis} avis)</span>)}</div>
+                <div className="store-product-name"><h3>{product.name}</h3></div>
+                <div className="store-product-price price"><FormattedNumber value={product.price} style="currency" currency={product.currency}/></div>
+                <div className="store-product-link"><a href={product.url} target="_blank">Voir l'offre</a></div>
+              </li>
+            </ul>
+          </div>
+        </main>)
     }
-    return <div>Loading...</div>
+    return (<Loader/>)
   }
 }

@@ -18,11 +18,11 @@
     }
 
     .product-price {
-      color: #FF6600;
-      font-weight: bold;
-      font-size: 2rem;
-      line-height: 2rem;
       margin-top: 10px;
+    }
+
+    .product-avis {
+      font-size: 1.6rem;
     }
   }
 
@@ -47,6 +47,7 @@
   padding-bottom: 10px;
 
   h2 {
+    font-size: 1.8rem;
     margin-bottom: 20px;
   }
 
@@ -55,6 +56,7 @@
     border: 1px solid #E7E7E7;
     background-color: #F8F8F8;
     margin-bottom: 10px;
+    font-size: 1.4rem;
 
     & > div {
       width: calc(100% / 5);
@@ -62,10 +64,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    .store-product-name h3 {
-      font-size: 1.2rem;
     }
 
     .store-product-link {
@@ -81,11 +79,4 @@
       }
     }
   }
-}
-
-.price {
-  color: #FF6600;
-  font-weight: bold;
-  font-size: 2rem;
-  line-height: 2rem;
 }

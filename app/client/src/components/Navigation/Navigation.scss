@@ -1,0 +1,34 @@
+nav {
+  display: flex;
+  background-color: #222222;
+  height: 60px;
+  color: #FFFFFF;
+
+  #brand {
+    display: flex;
+
+    a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 30px;
+      font-size: 2rem;
+    }
+  }
+
+  #menu {
+    display: flex;
+
+    li {
+      display: flex;
+
+      a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 30px;
+        font-size: 1.6rem;
+      }
+    }
+  }
+}
