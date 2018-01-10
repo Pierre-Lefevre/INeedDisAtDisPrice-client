@@ -19,7 +19,9 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "auth0-js": "^9.0.2",
     "axios": "^0.17.1",
+    "history": "^4.7.2",
     "moment": "^2.20.1",
     "npm-run-all": "^4.1.2",
     "react": "^16.2.0",

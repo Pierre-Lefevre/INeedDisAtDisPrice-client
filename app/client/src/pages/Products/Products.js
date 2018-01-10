@@ -9,7 +9,6 @@ import './Products.css'
 export default class Products extends React.Component {
   constructor (props) {
     super(props)
-
     this.state = {products: []}
   }
 
@@ -28,7 +27,7 @@ export default class Products extends React.Component {
     if (this.state.products.length !== 0) {
       const persons = this.state.products.map((item, i) => (
         <li key={item._id}>
-          <Link to={this.props.match.url + '' + item._id}>
+          <Link to={'/product/' + item._id}>
             <figure>
               <img src={'/img/products/' + item.image_name + '.jpg'} alt={item.name}/>
               <figcaption>

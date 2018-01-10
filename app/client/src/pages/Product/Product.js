@@ -75,6 +75,7 @@ export default class Product extends React.Component {
               </div>
             </div>
             <div id="product-price-chart">
+              <h2>Évolution du prix</h2>
               <ResponsiveContainer>
                 <LineChart data={data}>
                   <Line dataKey="price" stroke="#FF6600" activeDot={{r: 6}}/>

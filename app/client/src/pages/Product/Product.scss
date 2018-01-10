@@ -29,6 +29,10 @@
   #product-price-chart {
     height: 250px;
 
+    h2 {
+      text-align: center;
+    }
+
     .recharts-cartesian-axis-ticks text {
       fill: #FF6600;
     }

@@ -16,18 +16,25 @@ nav {
     }
   }
 
-  #menu {
+  #menu-container {
+    flex: 1;
     display: flex;
+    justify-content: space-between;
 
-    li {
+    .menu {
       display: flex;
 
-      a {
+      li {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px 30px;
-        font-size: 1.6rem;
+
+        a {
+          cursor: pointer;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 10px 30px;
+          font-size: 1.6rem;
+        }
       }
     }
   }
