@@ -31,3 +31,4 @@ class Product(scrapy.Item):
     rate = scrapy.Field()
     max_rate = scrapy.Field()
     nb_avis = scrapy.Field()
+    price_history = scrapy.Field()

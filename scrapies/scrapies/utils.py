@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import hashlib
 
 CURRENCY_MAPPING = {
@@ -14,7 +15,7 @@ def generate_open_ssl_hash(name):
 
 
 def get_currency_code(currency_symbol):
-    return CURRENCY_MAPPING[currency_symbol.strip()]
+    return CURRENCY_MAPPING[currency_symbol.strip().encode('utf-8')]
 
 
 def string_to_float(string):
