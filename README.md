@@ -1,4 +1,4 @@
-# INeedDisAtDisPrice
+# INeedDisAtDisPrice-client
 
 ## Get started
 
