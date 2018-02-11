@@ -1,33 +1,41 @@
 <template>
-  <div class="loader">
+  <div class="loader" :class="mainClass">
     <div></div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'loader'
+  name: 'loader',
+  props: ['mainClass']
 }
 </script>
 
 <style scoped lang="scss">
   .loader {
     display: flex;
-    position: fixed;
     z-index: 700;
     width: 100vw;
-    height: calc(100vh - 60px);
     justify-content: center;
     align-items: center;
     transition: opacity 2s linear;
+
+    &.products {
+      height: 400px;
+    }
+
+    &:not(.products) {
+      position: fixed;
+      height: calc(100vh - 60px);
+    }
 
     > div {
       width: 150px;
       height: 150px;
       border-radius: 50%;
       border: 3px solid transparent;
-      border-top-color: #222222;
-      border-bottom-color: #222222;
+      border-top-color: $black;
+      border-bottom-color: $black;
       animation: spin 3s linear infinite;
 
       &:before {
@@ -39,8 +47,8 @@ export default {
         bottom: 15px;
         border-radius: 50%;
         border: 3px solid transparent;
-        border-top-color: #222222;
-        border-bottom-color: #222222;
+        border-top-color: $black;
+        border-bottom-color: $black;
         animation: spin 4s linear infinite;
       }
 
@@ -53,8 +61,8 @@ export default {
         bottom: 32px;
         border-radius: 50%;
         border: 3px solid transparent;
-        border-top-color: #222222;
-        border-bottom-color: #222222;
+        border-top-color: $black;
+        border-bottom-color: $black;
         animation: spin 2s linear infinite;
       }
     }
@@ -69,5 +77,4 @@ export default {
       transform: rotate(360deg);
     }
   }
-
 </style>

@@ -1,0 +1,87 @@
+html {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10px;
+  color: $black;
+}
+
+main {
+  min-height: calc(100vh - 60px);
+}
+
+.bg-cover {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  background: url('/static/img/home/boxes.jpg') no-repeat fixed center;
+  background-size: cover;
+
+  .darker {
+    width: 100%;
+    min-height: calc(100vh - 60px);
+    background-color: $darker;
+  }
+}
+
+.center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #FFFFFF;
+}
+
+.black-bloc {
+  background-color: $black-opacity;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+}
+
+.my-button {
+  border: none;
+  cursor: pointer;
+  background-color: $orange;
+  padding: 10px;
+  font-size: 1.5rem;
+  border-radius: 2px;
+  transition: transform .2s ease-in-out;
+}
+
+.my-input {
+  border: none;
+  border-bottom: 1px solid #FFFFFF;
+  background-color: transparent;
+  color: #FFFFFF;
+  padding: 5px;
+}
+
+.notification {
+  padding: 15px;
+  font-size: 1.5rem;
+  border: 1px solid transparent;
+}
+
+.notification-success {
+  color: #3C763D;
+  background-color: #DFF0D8;
+  border-color: #D6D9C6;
+}
+
+.notification-info {
+  color: #31708F;
+  background-color: #D9EDF7;
+  border-color: #BCE8F1;
+}
+
+.notification-error {
+  color: #A94442;
+  background-color: #F2DEDE;
+  border-color: #EBCCD1;
+}
+
+.price {
+  color: $orange;
+  font-weight: bold;
+  font-size: 2rem;
+  line-height: 2rem;
+}

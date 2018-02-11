@@ -1,45 +1,68 @@
 <template>
-  <div v-if="products">
-    <button @click="firstPage">First</button>
-    <button @click="previousPage">Previous</button>
-    <button @click="page(getParams.page - 3)" v-if="getParams.page > 3">{{ getParams.page - 3}}</button>
-    <button @click="page(getParams.page - 2)" v-if="getParams.page > 2">{{ getParams.page - 2}}</button>
-    <button @click="page(getParams.page - 1)" v-if="getParams.page > 1">{{ getParams.page - 1}}</button>
-    <button @click="page(getParams.page)" style="background-color: red">{{ getParams.page }}</button>
-    <button @click="page(getParams.page + 1)" v-if="getParams.page <= nbPage - 1">{{ getParams.page + 1}}</button>
-    <button @click="page(getParams.page + 2)" v-if="getParams.page <= nbPage - 2">{{ getParams.page + 2}}</button>
-    <button @click="page(getParams.page + 3)" v-if="getParams.page <= nbPage - 3">{{ getParams.page + 3}}</button>
-    <button @click="nextPage">Next</button>
-    <button @click="lastPage">Last</button>
-    <ul id="products-list" v-if="products.length > 0">
-      <li :key="i" v-for="(product, i) in products">
-        <router-link :to="{name: 'Product', params: {id: product._id}}" tag="a">
-          <figure>
-            <img :src="$store.state.serverUrl + '/api/image/' + product.store + '/' + product.image_name + '.jpg'" :alt="product.name"/>
-            <figcaption>
-              <div class="product-name">{{product.name}}</div>
-              <div class="product-price price">
-                <template v-if="product.minPrice === product.maxPrice">
-                  {{product.price}} {{product.currency | currencySymbol}}
-                </template>
-                <template v-else>
-                  {{product.minPrice}} {{product.currency | currencySymbol}} - {{product.maxPrice}} {{product.currency | currencySymbol}}
-                </template>
-              </div>
-              <div>
-                {{ product.similarities.length + 1 }} offre{{ product.similarities.length + 1 > 1 ? 's' : '' }}
-              </div>
-            </figcaption>
-          </figure>
-        </router-link>
-      </li>
-    </ul>
-    <div v-else>
-      <p>Aucun produit ne correspond à votre recherche.</p>
+  <div id="products-wrapper">
+    <div class="pagination">
+      <button :class="{disable: getParams.page === 1}" @click="firstPage">&#60;&#60;</button>
+      <button :class="{disable: getParams.page === 1}" @click="previousPage">&#60;</button>
+      <button @click="page(getParams.page - 3)" v-if="getParams.page > 3">{{ getParams.page - 3 }}</button>
+      <button @click="page(getParams.page - 2)" v-if="getParams.page > 2">{{ getParams.page - 2 }}</button>
+      <button @click="page(getParams.page - 1)" v-if="getParams.page > 1">{{ getParams.page - 1 }}</button>
+      <button class="current" @click="page(getParams.page)">{{ getParams.page }}</button>
+      <button @click="page(getParams.page + 1)" v-if="getParams.page <= nbPage - 1">{{ getParams.page + 1 }}</button>
+      <button @click="page(getParams.page + 2)" v-if="getParams.page <= nbPage - 2">{{ getParams.page + 2 }}</button>
+      <button @click="page(getParams.page + 3)" v-if="getParams.page <= nbPage - 3">{{ getParams.page + 3 }}</button>
+      <button :class="{disable: getParams.page === nbPage}" @click="nextPage">&#62;</button>
+      <button :class="{disable: getParams.page === nbPage}" @click="lastPage">&#62;&#62;</button>
     </div>
-  </div>
-  <div v-else>
-    <loader></loader>
+    <div v-if="products">
+      <div v-if="products.length > 0">
+        <ul id="products-list" v-if="products.length > 0">
+          <li :key="i" v-for="(product, i) in products">
+            <router-link :to="{name: 'Product', params: {id: product._id}}" tag="a">
+              <figure>
+                <img :src="$store.state.serverUrl + '/api/image/' + product.store + '/' + product.image_name + '.jpg'" :alt="product.name"/>
+                <figcaption>
+                  <div class="product-name">{{product.name}}</div>
+                  <div class="product-wrapper-info">
+                    <div class="product-price price">
+                      <template v-if="product.minPrice === product.maxPrice">
+                        {{product.price}} {{product.currency | currencySymbol}}
+                      </template>
+                      <template v-else>
+                        {{product.minPrice}} {{product.currency | currencySymbol}} - {{product.maxPrice}} {{product.currency | currencySymbol}}
+                      </template>
+                    </div>
+                    <div class="product-offer">
+                      {{ product.similarities.length + 1 }} offre{{ product.similarities.length + 1 > 1 ? 's' : '' }}
+                    </div>
+                  </div>
+                </figcaption>
+              </figure>
+            </router-link>
+          </li>
+        </ul>
+      </div>
+      <div class="no-product" v-else>
+        <div class="notification notification-info">
+          <p>Aucun produit ne correspond à votre recherche.</p>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <loader mainClass="products"/>
+    </div>
+    <div class="pagination">
+      <button :class="{disable: getParams.page === 1}" @click="firstPage">&#60;&#60;</button>
+      <button :class="{disable: getParams.page === 1}" @click="previousPage">&#60;</button>
+      <button @click="page(getParams.page - 3)" v-if="getParams.page > 3">{{ getParams.page - 3}}</button>
+      <button @click="page(getParams.page - 2)" v-if="getParams.page > 2">{{ getParams.page - 2}}</button>
+      <button @click="page(getParams.page - 1)" v-if="getParams.page > 1">{{ getParams.page - 1}}</button>
+      <button class="current" @click="page(getParams.page)">{{ getParams.page }}</button>
+      <button @click="page(getParams.page + 1)" v-if="getParams.page <= nbPage - 1">{{ getParams.page + 1}}</button>
+      <button @click="page(getParams.page + 2)" v-if="getParams.page <= nbPage - 2">{{ getParams.page + 2}}</button>
+      <button @click="page(getParams.page + 3)" v-if="getParams.page <= nbPage - 3">{{ getParams.page + 3}}</button>
+      <button :class="{disable: getParams.page === nbPage}" @click="nextPage">&#62;</button>
+      <button :class="{disable: getParams.page === nbPage}" @click="lastPage">&#62;&#62;</button>
+    </div>
   </div>
 </template>
 
@@ -66,7 +89,7 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       this.getParams.search = newRoute.query.search ? newRoute.query.search : ''
-      this.getParams.page = newRoute.query.page ? newRoute.query.page : 1
+      this.getParams.page = newRoute.query.page ? parseInt(newRoute.query.page) : 1
       this.fetchProducts()
     },
     productsSearch (search, oldSearch) {
@@ -78,7 +101,7 @@ export default {
   },
   mounted () {
     this.getParams.search = this.$route.query.search ? this.$route.query.search : ''
-    this.getParams.page = this.$route.query.page ? this.$route.query.page : 1
+    this.getParams.page = this.$route.query.page ? parseInt(this.$route.query.page) : 1
     this.fetchProducts()
   },
   methods: {
@@ -161,46 +184,119 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  #products-wrapper {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    padding: 50px 20px;
+    font-size: 1.5rem;
+
+    button {
+      border: none;
+      cursor: pointer;
+      background-color: transparent;
+      height: 30px;
+      width: 30px;
+      transition: transform .2s ease-in-out;
+
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+
+      &.current {
+        color: $orange;
+        text-decoration: underline;
+      }
+
+      &.disable {
+        color: $grey;
+      }
+
+      &:hover {
+        transform: scale(1.2);
+      }
+    }
+  }
+
   #products-list {
     display: flex;
     flex-wrap: wrap;
 
     li {
       display: flex;
-      width: calc((100% - 30px) / 4);
-      border: 1px solid #E7E7E7;
-      margin-bottom: 10px;
+      width: calc((100% + 3px) / 4);
+      background-color: #FFFFFF;
+      border: 1px solid $grey;
+      margin-left: -1px;
+      margin-top: -1px;
+      transition: transform .2s ease-in-out;
 
-      &:not(:nth-child(4n+0)) {
-        margin-right: 10px;
+      &:nth-child(4n+1) {
+        margin-left: 0;
+        transform-origin: left center;
+      }
+
+      &:nth-child(4n+4) {
+        transform-origin: right center;
+      }
+
+      &:hover {
+        transform: scale(1.040);
       }
 
       a {
-        display: block;
         padding: 20px;
+        display: flex;
+        width: 100%;
 
-        &:hover img {
-          transform: scale(0.95);
-        }
-
-        img {
+        figure {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           width: 100%;
-          transition: transform 150ms ease-out;
-        }
 
-        figcaption {
-          margin-top: 20px;
-
-          .product-name {
-            color: #000000;
-            font-size: 1.6rem;
+          img {
+            height: 130px;
+            width: auto;
+            max-width: 100%;
           }
 
-          .product-price {
-            margin-top: 10px;
+          figcaption {
+            margin-top: 20px;
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            .product-name {
+              font-size: 1.6rem;
+            }
+
+            .product-wrapper-info {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              margin-top: 20px;
+
+              .product-offer {
+                font-size: 1.4rem;
+              }
+            }
           }
         }
       }
     }
+  }
+
+  .no-product {
+    display: flex;
+    justify-content: center
   }
 </style>

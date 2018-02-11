@@ -1,111 +1,108 @@
 <template>
-  <div v-if="product">
-    <div id="product">
-      <div id="product-img">
-        <img :src="$store.state.serverUrl + '/api/image/' + product.store + '/' + product.image_name + '.jpg'" :alt="product.name"/>
-      </div>
-      <div id="product-info">
-        <div class="product-name">
-          <h1>{{product.name}}</h1>
-        </div>
-        <div class="product-price price">
-          {{product.price}} {{product.currency | currencySymbol}}
-        </div>
-        <div class="product-avis">
-          <template v-if="!product.nb_avis">
-            <span>Aucun avis</span>
-          </template>
-          <template v-else>
-            <span>{{product.rate}}/{{product.max_rate}} ({{product.nb_avis}} avis)</span>
-          </template>
-        </div>
-      </div>
-      <div id="product-price-chart">
-        <line-chart :data="lineChart" :width="350" :height="350"></line-chart>
-        <div v-if="isLoggedIn">
-          <button id="show-modal" @click="showModal = true">M'alerter</button>
-        </div>
-      </div>
-    </div>
-    <div class="stores">
-      <h2>Disponible sur</h2>
-      <ul>
-        <li>
-          <div class="store-logo">
-            <img :src="'/static/img/stores/logos/' + product.store + '.png'" :alt="product.store">
+  <div id="product-wrapper" class="bg-cover">
+    <div class="darker">
+      <div v-if="product">
+        <div id="product">
+          <div id="product-img">
+            <img :src="$store.state.serverUrl + '/api/image/' + product.store + '/' + product.image_name + '.jpg'" :alt="product.name"/>
           </div>
-          <div class="store-product-avis">
-            <template v-if="!product.nb_avis">
-              <span>Aucun avis</span>
-            </template>
-            <template v-else>
-              <span>{{product.rate}}/{{product.max_rate}} ({{product.nb_avis}} avis)</span>
-            </template>
-          </div>
-          <div class="store-product-name"><h3>{{product.name}}</h3></div>
-          <div class="store-product-price price">
-            {{product.price}} {{product.currency | currencySymbol}}
-          </div>
-          <div class="store-product-link"><a :href="product.url" target="_blank">Voir l'offre</a></div>
-        </li>
-      </ul>
-    </div>
-    <div class="stores" v-if="similarProducts.length > 0">
-      <h2>Variantes</h2>
-      <ul>
-        <li :key="i" v-for="(similarProduct, i) in similarProducts">
-          <div class="store-logo">
-            <img :src="'/static/img/stores/logos/' + similarProduct.store + '.png'" :alt="similarProduct.store">
-          </div>
-          <div class="store-product-avis">
-            <template v-if="!similarProduct.nb_avis">
-              <span>Aucun avis</span>
-            </template>
-            <template v-else>
-              <span>{{similarProduct.rate}}/{{similarProduct.max_rate}} ({{similarProduct.nb_avis}} avis)</span>
-            </template>
-          </div>
-          <div class="store-product-name"><h3>{{similarProduct.name}}</h3></div>
-          <div class="store-product-price price">
-            {{similarProduct.price}} {{similarProduct.currency | currencySymbol}}
-          </div>
-          <div class="store-product-link"><a :href="similarProduct.url" target="_blank">Voir l'offre</a></div>
-        </li>
-      </ul>
-    </div>
-
-    <transition name="modal">
-      <div class="modal-mask" v-if="showModal">
-        <div class="modal-wrapper" @click.self="showModal = false">
-          <div class="modal-container">
-            <div class="modal-header">
-              <slot name="header">
-                Demander à être alerter par email
-              </slot>
+          <div id="product-info">
+            <div class="product-name">
+              <h1>{{product.name}}</h1>
             </div>
-
-            <div class="modal-body">
-              <slot name="body">
-                Je souhaite être alerté par email lorsque le prix de ce produit sera de :
-                <input type="number" v-model="alertPrice">
-              </slot>
+            <div class="product-price price">
+              {{product.price}} {{product.currency | currencySymbol}}
             </div>
-
-            <div class="modal-footer">
-              <slot name="footer">
-                default footer
-                <button class="modal-default-button" @click="createAlert">
-                  Valider
-                </button>
-              </slot>
+            <div class="product-avis">
+              <template v-if="!product.nb_avis">
+                <span>Aucun avis</span>
+              </template>
+              <template v-else>
+                <span>{{product.rate}}/{{product.max_rate}} ({{product.nb_avis}} avis)</span>
+              </template>
             </div>
           </div>
+          <div id="product-price-chart">
+            <line-chart :data="lineChart" :width="350" :height="350"></line-chart>
+            <button id="show-modal" class="my-button" @click="showModal = true" v-if="isLoggedIn">M'alerter !</button>
+          </div>
         </div>
+        <div id="offer-wrapper">
+          <div class="offer">
+            <h2>Disponible sur</h2>
+            <ul>
+              <li>
+                <div class="store-logo">
+                  <img :src="'/static/img/stores/logos/' + product.store + '.png'" :alt="product.store">
+                </div>
+                <div class="store-product-name">
+                  <p>{{product.name}}</p>
+                </div>
+                <div class="store-product-price price">
+                  {{product.price}} {{product.currency | currencySymbol}}
+                </div>
+                <div class="store-product-avis">
+                  <template v-if="!product.nb_avis">
+                    <span>Aucun avis</span>
+                  </template>
+                  <template v-else>
+                    <span>{{product.rate}}/{{product.max_rate}} ({{product.nb_avis}} avis)</span>
+                  </template>
+                </div>
+                <div class="store-product-link"><a :href="product.url" target="_blank">Voir l'offre</a></div>
+              </li>
+            </ul>
+          </div>
+          <div class="offer" v-if="similarProducts.length > 0">
+            <h2>Variantes</h2>
+            <ul>
+              <li :key="i" v-for="(similarProduct, i) in similarProducts">
+                <div class="store-logo">
+                  <img :src="'/static/img/stores/logos/' + similarProduct.store + '.png'" :alt="similarProduct.store">
+                </div>
+                <div class="store-product-name">
+                  <router-link :to="{name: 'Product', params: {id: similarProduct._id}}" tag="a">
+                    <p>{{similarProduct.name}}</p>
+                  </router-link>
+                </div>
+                <div class="store-product-price price">
+                  {{similarProduct.price}} {{similarProduct.currency | currencySymbol}}
+                </div>
+                <div class="store-product-avis">
+                  <template v-if="!similarProduct.nb_avis">
+                    <span>Aucun avis</span>
+                  </template>
+                  <template v-else>
+                    <span>{{similarProduct.rate}}/{{similarProduct.max_rate}} ({{similarProduct.nb_avis}} avis)</span>
+                  </template>
+                </div>
+                <div class="store-product-link"><a :href="similarProduct.url" target="_blank">Voir l'offre</a></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <transition name="modal">
+          <div class="modal-mask" v-if="showModal">
+            <div class="modal-wrapper" @click.self="showModal = false">
+              <div class="modal-container">
+                <div class="modal-header">
+                  Demander à être alerter par email
+                </div>
+                <div class="modal-body">
+                  Je souhaite être alerté par email lorsque le prix de ce produit sera de : <input type="number" v-model="alertPrice">
+                </div>
+                <div class="modal-footer">
+                  <button class="modal-default-button my-button" @click="createAlert">Valider</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
       </div>
-    </transition>
-  </div>
-  <div v-else>
-    <loader></loader>
+      <div v-else>
+        <loader></loader>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -170,20 +167,15 @@ export default {
   },
   watch: {
     product (product) {
-      console.log(product.price_history)
       product.price_history.forEach(price => {
         this.lineChart.labels.push(filters.dateEnToFr(price.date))
         this.lineChart.data.push(price.price)
       })
       this.lineChart.currency = filters.currencySymbol(product.price_history[0].currency)
-
       if (this.lineChart.labels.length === 1) {
         this.lineChart.labels.push(this.lineChart.labels[0])
         this.lineChart.data.push(this.lineChart.data[0])
       }
-
-      // this.lineChart.labels = ['10/12/2017', '15/12/2017', '27/12/2017', '10/01/2018', '14/01/2018', '25/01/2018', '27/01/2018']
-      // this.lineChart.data = [4000, 3000, 2000, 2780, 1890, 2390, product.price]
       this.alertPrice = product.price
     }
   },
@@ -194,68 +186,132 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  #product-wrapper .darker > div {
+    width: 100%;
+  }
+
   #product {
     display: flex;
-    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #FFFFFF;
 
     & > div {
       width: calc(100% / 3);
     }
 
-    #product-img img {
-      width: 100%;
+    #product-img {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+
+      img {
+        width: 100%;
+      }
     }
 
     #product-info {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      margin-right: 20px;
+
+      & > *:not(:last-child) {
+        margin-bottom: 20px;
+      }
 
       .product-name h1 {
         font-size: 2rem;
         font-weight: bold;
       }
 
-      .product-price {
-        margin-top: 10px;
-      }
-
       .product-avis {
         font-size: 1.6rem;
       }
     }
+
+    #product-price-chart {
+
+      button {
+        display: flex;
+        margin: auto;
+        color: #FFFFFF;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
   }
 
-  .stores {
-    padding-bottom: 10px;
+  #offer-wrapper {
+    padding: 20px;
+  }
+
+  .offer {
+    color: #FFFFFF;
+
+    &:not(:last-of-type) {
+      margin-bottom: 20px;
+    }
 
     h2 {
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 20px;
     }
 
     li {
       display: flex;
-      border: 1px solid #E7E7E7;
-      background-color: #F8F8F8;
-      margin-bottom: 10px;
       font-size: 1.4rem;
+      border-radius: 2px;
+
+      &:not(:last-of-type) {
+        margin-bottom: 5px;
+      }
 
       & > div {
-        width: calc(100% / 5);
+        width: calc((100% - 25px) / 5);
         padding: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: $black-opacity;
+      }
+
+      .store-logo img {
+        height: 30px;
+        width: auto;
+      }
+
+      .store-product-name a {
+        text-decoration: underline;
       }
 
       .store-product-link {
         display: flex;
+        align-items: stretch;
+        padding: 0;
 
         a {
           flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           text-align: center;
-          background-color: #FF6600;
-          border-radius: 2px;
+          background-color: $orange;
           padding: 10px;
           color: #FFFFFF;
+          position: relative;
+
+          &:after {
+            content: '';
+            width: 25px;
+            background-color: $orange;
+            clip-path: polygon(100% 50%, 0 0, 0 100%);
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: -25px;
+          }
         }
       }
     }
@@ -268,38 +324,58 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .5);
+    background-color: $darker;
     display: table;
     transition: opacity .3s ease;
-  }
 
-  .modal-wrapper {
-    display: table-cell;
-    vertical-align: middle;
+    .modal-wrapper {
+      display: table-cell;
+      vertical-align: middle;
+    }
   }
 
   .modal-container {
-    width: 300px;
-    margin: 0px auto;
-    padding: 20px 30px;
-    background-color: #fff;
+    width: 80%;
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
     border-radius: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+    box-shadow: 0 2px 8px $darker;
     transition: all .3s ease-in-out;
-    font-family: Helvetica, Arial, sans-serif;
-  }
+    font-size: 1.5rem;
 
-  .modal-header h3 {
-    margin-top: 0;
-    color: #42b983;
-  }
+    .modal-header {
+      color: #FFFFFF;
+      margin-top: 0;
+      border-radius: 2px 2px 0 0;
+      background-color: $black;
+      padding: 20px;
+    }
 
-  .modal-body {
-    margin: 20px 0;
-  }
+    .modal-body {
+      padding: 20px;
 
-  .modal-default-button {
-    float: right;
+      input[type='number'] {
+        border: 1px solid $black;
+        border-radius: 2px;
+        padding: 5px;
+        width: 90px;
+        background-color: $black;
+        color: #FFFFFF;
+      }
+    }
+
+    .modal-footer {
+      padding: 0 20px 20px 20px;
+
+      button {
+        color: #FFFFFF;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
   }
 
   /*

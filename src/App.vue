@@ -1,17 +1,15 @@
 <template>
-  <div id="app">
+  <div id="app-wrapper">
     <header>
       <nav id="navbar">
         <div id="brand">
-          <router-link :to="{name: 'Home'}" tag="a">I Need Dis At Dis Price</router-link>
+          <router-link :to="{name: 'Home'}" tag="a">
+            <img src="/static/img/icons/logo.svg"/>
+            <p>I Need Dis At Dis Price</p>
+          </router-link>
         </div>
         <div id="menu-container">
-          <ul class="menu">
-            <li>
-              <router-link :to="{name: 'Products'}" tag="a">Produits</router-link>
-            </li>
-          </ul>
-          <search/>
+          <search mainClass="nav"/>
           <ul class="menu authenticated-navigation" v-if="isLoggedIn">
             <li>
               <router-link :to="{name: 'Profile'}" tag="a">Profil</router-link>
@@ -32,7 +30,7 @@
       </nav>
     </header>
     <main>
-      <router-view/>
+      <router-view :key="$route.fullPath"/>
     </main>
     <alert/>
   </div>
@@ -63,56 +61,9 @@ export default {
 </script>
 
 <style lang="scss">
-  #app {
-    /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
-    /*-webkit-font-smoothing: antialiased;*/
-    /*-moz-osx-font-smoothing: grayscale;*/
-    /*text-align: center;*/
-    /*color: #2c3e50;*/
-    /*margin-top: 60px;*/
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  html {
-    font-family: sans-serif;
-    font-size: 10px;
-    color: #222222;
-  }
-
-  body, h1, h2, h3, ul {
-    margin: 0;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-
-  a:hover, a:visited, a:link, a:active {
-    text-decoration: none;
-    color: inherit;
-    outline: none;
-  }
-
-  main {
-    margin: 20px;
-  }
-
-  .price {
-    color: #FF6600;
-    font-weight: bold;
-    font-size: 2rem;
-    line-height: 2rem;
-  }
-
-  /* Menu */
-
   #navbar {
     display: flex;
-    background-color: #222222;
+    background-color: $black;
     height: 60px;
     color: #FFFFFF;
 
@@ -120,11 +71,18 @@ export default {
       display: flex;
 
       a {
+        width: 340px;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 10px 30px;
         font-size: 2rem;
+
+        img {
+          height: 100%;
+          width: auto;
+          margin-right: 30px;
+        }
       }
     }
 

@@ -1,14 +1,18 @@
 <template>
-  <div>
-    <h1 class="color-blue">Inscription</h1>
-    <form @submit.prevent="signUp">
-      <input type="text" placeholder="Prénom" v-model="firstname">
-      <input type="text" placeholder="Nom" v-model="lastname">
-      <input type="text" placeholder="Pseudo" v-model="pseudo">
-      <input type="email" placeholder="Email" v-model="email">
-      <input type="password" placeholder="Mot de passe" v-model="password">
-      <button type="submit" class="btn-primary bg-blue hvr-grow">S'inscrire</button>
-    </form>
+  <div id="sign-up-wrapper" class="bg-cover">
+    <div class="darker center-content">
+      <div class="form-wrapper black-bloc">
+        <h1>Inscription</h1>
+        <form @submit.prevent="signUp">
+          <input class="my-input" type="text" placeholder="Prénom" v-model="firstname">
+          <input class="my-input" type="text" placeholder="Nom" v-model="lastname">
+          <input class="my-input" type="text" placeholder="Pseudo" v-model="pseudo">
+          <input class="my-input" type="email" placeholder="Email" v-model="email">
+          <input class="my-input" type="password" placeholder="Mot de passe" v-model="password">
+          <button type="submit" class="my-button">Valider</button>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,6 +59,34 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  #sign-up-wrapper .darker .form-wrapper {
+    align-items: center;
+    width: 80%;
+    max-width: 400px;
 
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+
+    & > form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      .my-input:not(:last-of-type) {
+        margin-bottom: 10px;
+      }
+
+      button {
+        margin-top: 20px;
+        align-self: flex-start;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
 </style>

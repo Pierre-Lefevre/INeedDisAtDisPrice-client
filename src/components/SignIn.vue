@@ -1,11 +1,15 @@
 <template>
-  <div>
-    <h1 class="color-green">Connexion</h1>
-    <form @submit.prevent="login">
-      <input type="text" placeholder="Pseudo" v-model="pseudo">
-      <input type="password" placeholder="Mot de passe" v-model="password">
-      <button type="submit" class="btn-primary bg-green hvr-grow">Se connecter</button>
-    </form>
+  <div id="sign-in-wrapper" class="bg-cover">
+    <div class="darker center-content">
+      <div class="form-wrapper black-bloc">
+        <h1>Connexion</h1>
+        <form @submit.prevent="login">
+          <input class="my-input" type="text" placeholder="Pseudo" v-model="pseudo">
+          <input class="my-input" type="password" placeholder="Mot de passe" v-model="password">
+          <button type="submit" class="my-button">Valider</button>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -38,6 +42,34 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  #sign-in-wrapper .darker .form-wrapper {
+    align-items: center;
+    width: 80%;
+    max-width: 400px;
 
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+
+    & > form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      .my-input:not(:last-of-type) {
+        margin-bottom: 10px;
+      }
+
+      button {
+        margin-top: 20px;
+        align-self: flex-start;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
 </style>

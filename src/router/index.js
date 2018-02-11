@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import guards from '@/services/guards'
-// import Home from '@/components/Home'
+import Home from '@/components/Home'
 import Products from '@/components/Products'
 import Product from '@/components/Product'
 import SignIn from '@/components/SignIn'
@@ -15,7 +15,7 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
-      component: Products,
+      component: Home,
       meta: {
         title: 'Accueil'
       }

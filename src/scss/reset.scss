@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+body, h1, h2, h3, ul, p, figure {
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+button {
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+a:hover, a:visited, a:link, a:active {
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}

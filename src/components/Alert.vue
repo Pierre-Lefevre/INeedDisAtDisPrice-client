@@ -1,7 +1,7 @@
 <template>
   <div v-show="alerts.length" id="alert-wrapper">
     <transition-group name="fade">
-      <div v-for="(alert, i) in alerts" v-if="alert.show" :key="i" class="alert" :class="alert.class">
+      <div v-for="(alert, i) in alerts" v-if="alert.show" :key="i" class="notification" :class="alert.class">
         <p>{{ alert.message }}</p>
       </div>
     </transition-group>
@@ -25,13 +25,13 @@ export default {
 
       switch (alert.type) {
         case 'success':
-          alert.class = 'bg-green'
+          alert.class = 'notification-success'
           break
         case 'info':
-          alert.class = 'bg-blue'
+          alert.class = 'notification-info'
           break
         case 'error':
-          alert.class = 'bg-red'
+          alert.class = 'notification-error'
           break
       }
 
@@ -59,16 +59,6 @@ export default {
     width: 100%;
     opacity: 1;
     padding: 20px;
-  }
-
-  .alert {
-    padding: 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-  }
-
-  .alert:not(:last-child) {
-    margin-bottom: 20px;
   }
 
   .fade-enter-active, .fade-leave-active {
