@@ -45,6 +45,10 @@ main {
   font-size: 1.5rem;
   border-radius: 2px;
   transition: transform .2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .my-input {

@@ -62,13 +62,9 @@ export default {
         margin-bottom: 10px;
       }
 
-      button {
+      .my-button {
         margin-top: 20px;
         align-self: flex-start;
-
-        &:hover {
-          transform: scale(1.1);
-        }
       }
     }
   }

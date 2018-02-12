@@ -231,14 +231,10 @@ export default {
 
     #product-price-chart {
 
-      button {
+      .my-button {
         display: flex;
         margin: auto;
         color: #FFFFFF;
-
-        &:hover {
-          transform: scale(1.1);
-        }
       }
     }
   }

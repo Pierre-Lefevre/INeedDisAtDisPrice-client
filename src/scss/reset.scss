@@ -3,6 +3,10 @@
   outline: none;
 }
 
+*::-moz-focus-inner {
+  border: 0;
+}
+
 body, h1, h2, h3, ul, p, figure {
   margin: 0;
 }
@@ -17,6 +21,7 @@ button {
   color: inherit;
   font-size: inherit;
   font-family: inherit;
+  outline:0;
 }
 
 a:hover, a:visited, a:link, a:active {

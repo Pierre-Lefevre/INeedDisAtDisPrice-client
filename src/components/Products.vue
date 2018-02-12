@@ -157,7 +157,7 @@ export default {
       this.products = null
       axios.get(this.buildUrl()).then(response => {
         this.products = response.data.products
-        this.nbPage = response.data.nbPage
+        this.nbPage = response.data.nbPage > 0 ? response.data.nbPage : 1
       }, error => {
         console.log(error)
       })
