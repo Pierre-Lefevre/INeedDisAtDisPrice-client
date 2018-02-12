@@ -6,7 +6,7 @@
         <p>Pseudo : {{user.pseudo}}</p>
         <p>Email : {{user.email}}</p>
       </div>
-      <div id="my-alerts" class="black-bloc" v-if="alerts.length > 0">
+      <div id="my-alerts" class="black-bloc" v-if="alerts && alerts.length > 0">
         <h2>Mes alertes</h2>
         <ul>
           <li class="alert" :key="i" v-for="(alert, i) in alerts">

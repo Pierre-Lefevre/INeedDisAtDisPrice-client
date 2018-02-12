@@ -29,7 +29,11 @@ export default {
         this.$store.commit('PRODUCTS_SEARCH', this.search)
       } else {
         this.$store.commit('PRODUCTS_SEARCH', this.search)
-        this.$router.push({name: 'Products', query: {search: this.search}})
+        let query = {}
+        if (this.search !== '') {
+          query.search = this.search
+        }
+        this.$router.push({name: 'Products', query})
       }
     }
   },

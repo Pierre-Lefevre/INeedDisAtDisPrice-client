@@ -1,5 +1,24 @@
 <template>
   <div id="products-wrapper">
+    <div id="filter">
+      <div id="price-filter">
+        <p>Prix : </p>
+        <span>
+          <template v-if="parseInt(getParams.minPrice) < parseInt(getParams.maxPrice)">{{ getParams.minPrice }}</template>
+          <template v-else>{{ getParams.maxPrice }}</template>
+        </span>
+        <div class="range-slider">
+          <input v-model="getParams.minPrice" :min="minPriceBound" :max="maxPriceBound" step="1" type="range"/>
+          <input v-model="getParams.maxPrice" :min="minPriceBound" :max="maxPriceBound" step="1" type="range"/>
+        </div>
+        <span>
+          <template v-if="parseInt(getParams.maxPrice) > parseInt(getParams.minPrice)">{{ getParams.maxPrice }}</template>
+          <template v-else>{{ getParams.minPrice }}</template>
+        </span>
+      </div>
+      <button class="my-button" @click="filter">Filtrer</button>
+      <button class="my-button" @click="filterReset">Annuler</button>
+    </div>
     <div class="pagination">
       <button :class="{disable: getParams.page === 1}" @click="firstPage">&#60;&#60;</button>
       <button :class="{disable: getParams.page === 1}" @click="previousPage">&#60;</button>
@@ -22,19 +41,18 @@
                 <img :src="$store.state.serverUrl + '/api/image/' + product.store + '/' + product.image_name + '.jpg'" :alt="product.name"/>
                 <figcaption>
                   <div class="product-name">{{product.name}}</div>
-                  <div class="product-wrapper-info">
-                    <div class="product-price price">
+                  <div class="product-price price">{{ product.price }} {{ product.currency | currencySymbol }}</div>
+                  <template v-if="product.similarities.length > 0">
+                    <div class="product-offer">
+                      {{ product.similarities.length }} offre{{ product.similarities.length > 1 ? 's' : '' }}
                       <template v-if="product.minPrice === product.maxPrice">
-                        {{product.price}} {{product.currency | currencySymbol}}
+                        à <span class="price">{{ product.minPrice }} {{ product.currency | currencySymbol }}</span>
                       </template>
                       <template v-else>
-                        {{product.minPrice}} {{product.currency | currencySymbol}} - {{product.maxPrice}} {{product.currency | currencySymbol}}
+                        entre <span class="price">{{ product.minPrice }} {{ product.currency | currencySymbol }} - {{ product.maxPrice }} {{ product.currency | currencySymbol }}</span>
                       </template>
                     </div>
-                    <div class="product-offer">
-                      {{ product.similarities.length + 1 }} offre{{ product.similarities.length + 1 > 1 ? 's' : '' }}
-                    </div>
-                  </div>
+                  </template>
                 </figcaption>
               </figure>
             </router-link>
@@ -80,84 +98,112 @@ export default {
     return {
       getParams: {
         search: '',
-        page: 1
+        page: 1,
+        minPrice: -1,
+        maxPrice: -1
       },
       products: null,
-      nbPage: null
+      nbPage: 1,
+      minPriceBound: 0,
+      maxPriceBound: 0
     }
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
+      console.log('a')
       this.getParams.search = newRoute.query.search ? newRoute.query.search : ''
       this.getParams.page = newRoute.query.page ? parseInt(newRoute.query.page) : 1
+      this.getParams.minPrice = newRoute.query.minPrice ? parseInt(newRoute.query.minPrice) : -1
+      this.getParams.maxPrice = newRoute.query.maxPrice ? parseInt(newRoute.query.maxPrice) : -1
       this.fetchProducts()
     },
     productsSearch (search, oldSearch) {
       this.getParams.search = search
       this.getParams.page = 1
-      this.updateRoute({page: this.getParams.page, search: this.getParams.search})
-      this.fetchProducts()
+      this.updateRoute()
     }
   },
   mounted () {
     this.getParams.search = this.$route.query.search ? this.$route.query.search : ''
     this.getParams.page = this.$route.query.page ? parseInt(this.$route.query.page) : 1
+    this.getParams.minPrice = this.$route.query.minPrice ? parseInt(this.$route.query.minPrice) : -1
+    this.getParams.maxPrice = this.$route.query.maxPrice ? parseInt(this.$route.query.maxPrice) : -1
     this.fetchProducts()
   },
   methods: {
-    updateRoute (query) {
-      let finalQuery = {}
-      if (query.page !== 1) {
-        finalQuery.page = query.page
+    updateRoute () {
+      if (this.getParams.minPrice > this.getParams.maxPrice) {
+        let tmp = this.getParams.minPrice
+        this.getParams.minPrice = this.getParams.maxPrice
+        this.getParams.maxPrice = tmp
       }
-      finalQuery.search = query.search
-      this.$router.push({name: 'Products', query: finalQuery})
+      let query = {}
+      if (this.getParams.search !== '') {
+        query.search = this.getParams.search
+      }
+      if (this.getParams.page !== 1) {
+        query.page = this.getParams.page
+      }
+      if (this.getParams.minPrice !== -1) {
+        query.minPrice = this.getParams.minPrice
+      }
+      if (this.getParams.maxPrice !== -1) {
+        query.maxPrice = this.getParams.maxPrice
+      }
+      this.$router.push({name: 'Products', query})
     },
     firstPage () {
       if (this.getParams.page === 1) {
         return
       }
       this.getParams.page = 1
-      this.updateRoute({page: this.getParams.page, search: this.getParams.search})
-      this.fetchProducts()
+      this.updateRoute()
     },
     previousPage () {
       if (this.getParams.page <= 1) {
         return
       }
       this.getParams.page--
-      this.updateRoute({page: this.getParams.page, search: this.getParams.search})
-      this.fetchProducts()
+      this.updateRoute()
     },
     page (page) {
       if (this.getParams.page === page) {
         return
       }
       this.getParams.page = page
-      this.updateRoute({page: this.getParams.page, search: this.getParams.search})
-      this.fetchProducts()
+      this.updateRoute()
     },
     nextPage () {
       if (this.getParams.page >= this.nbPage) {
         return
       }
       this.getParams.page++
-      this.updateRoute({page: this.getParams.page, search: this.getParams.search})
-      this.fetchProducts()
+      this.updateRoute()
     },
     lastPage () {
       if (this.getParams.page === this.nbPage) {
         return
       }
       this.getParams.page = this.nbPage
-      this.updateRoute({page: this.getParams.page, search: this.getParams.search})
-      this.fetchProducts()
+      this.updateRoute()
+    },
+    filter () {
+      this.updateRoute()
+    },
+    filterReset () {
+      this.getParams.minPrice = -1
+      this.getParams.maxPrice = -1
+      this.updateRoute()
     },
     fetchProducts () {
       this.products = null
       axios.get(this.buildUrl()).then(response => {
         this.products = response.data.products
-        this.nbPage = response.data.nbPage > 0 ? response.data.nbPage : 1
+        this.nbPage = parseInt(response.data.nbPage) > 0 ? parseInt(response.data.nbPage) : 1
+        this.minPriceBound = parseInt(response.data.min)
+        this.maxPriceBound = parseInt(response.data.max)
+        this.getParams.minPrice = this.minPriceBound
+        this.getParams.maxPrice = this.maxPriceBound
       }, error => {
         console.log(error)
       })
@@ -191,6 +237,81 @@ export default {
     justify-content: space-between;
   }
 
+  #filter {
+    margin: 20px 20px 0 20px;
+
+    #price-filter {
+      display: flex;
+      margin-bottom: 20px;
+      align-items: center;
+
+      p, span {
+        font-size: 1.5rem;
+      }
+
+      span {
+        width: 50px;
+        text-align: center;
+      }
+
+      .range-slider {
+        position: relative;
+        width: 200px;
+        height: 35px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+
+        input[type=range] {
+          pointer-events: none;
+          position: absolute;
+          overflow: hidden;
+          top: 0;
+          bottom: 0;
+          width: 200px;
+          outline: none;
+          height: 18px;
+          margin: auto;
+
+          &::-webkit-slider-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 1;
+            outline: 0;
+          }
+
+          &::-moz-range-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 10;
+            /*-moz-appearance: none;*/
+          }
+
+          &::-moz-range-track {
+            position: relative;
+            z-index: -1;
+            background-color: $black;
+            border: 0;
+          }
+
+          &:last-of-type::-moz-range-track {
+            /*-moz-appearance: none;*/
+            background: none transparent;
+            border: 0;
+          }
+
+          &::-moz-focus-outer {
+            border: 0;
+          }
+        }
+      }
+    }
+
+    button:not(:last-of-type) {
+      margin-right: 10px;
+    }
+  }
+
   .pagination {
     display: flex;
     justify-content: center;
@@ -216,6 +337,7 @@ export default {
 
       &.disable {
         color: $grey;
+        cursor: inherit;
       }
 
       &:hover {
@@ -273,20 +395,23 @@ export default {
             width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
 
             .product-name {
               font-size: 1.6rem;
+              margin-bottom: 20px;
             }
 
-            .product-wrapper-info {
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-end;
-              margin-top: 20px;
+            .product-price:not(:last-child) {
+              margin-bottom: 20px;
+              flex: 1;
+            }
 
-              .product-offer {
-                font-size: 1.4rem;
+            .product-offer {
+              font-size: 1.4rem;
+              align-self: flex-end;
+
+              .price {
+                font-size: 1.6rem;
               }
             }
           }

@@ -234,7 +234,6 @@ export default {
       .my-button {
         display: flex;
         margin: auto;
-        color: #FFFFFF;
       }
     }
   }
