@@ -60,20 +60,18 @@ export default {
 
       input[type='text'] {
         border: 1px solid $grey;
-        background-color: transparent;
         color: #FFFFFF;
         padding: 5px;
         border-radius: 2px 0 0 2px;
       }
 
       button {
-        background: url('/static/img/icons/search.png') no-repeat center center;
         background-size: auto 50%;
         cursor: pointer;
         transition: background-size .2s ease-in-out;
         border: 1px solid $grey;
         border-left: none;
-        border-radius:  0 2px 2px 0;
+        border-radius: 0 2px 2px 0;
         width: 50px;
 
         &:hover {
@@ -83,18 +81,17 @@ export default {
     }
   }
 
-  .home {
-    width: 100%;
-    justify-content: center;
-    background-color: $black-opacity;
-    padding: 10px;
+  .home > form {
+    margin: 10px;
 
-    & > form {
+    input[type='text'] {
+      background-color: $black-opacity;
+      font-size: 1.5rem;
+      width: 300px;
+    }
 
-      input[type='text'] {
-        font-size: 1.5rem;
-        width: 300px;
-      }
+    button {
+      background: $black-opacity url('/static/img/icons/search.png') no-repeat center center;
     }
   }
 
@@ -106,12 +103,17 @@ export default {
 
       input[type='text'] {
         font-size: 1.5rem;
+        background-color: transparent;
         width: 200px;
         transition: width .2s ease-in-out;
 
         &:focus {
           width: 300px;
         }
+      }
+
+      button {
+        background: transparent url('/static/img/icons/search.png') no-repeat center center;
       }
     }
   }

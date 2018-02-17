@@ -110,7 +110,6 @@ export default {
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
-      console.log('a')
       this.getParams.search = newRoute.query.search ? newRoute.query.search : ''
       this.getParams.page = newRoute.query.page ? parseInt(newRoute.query.page) : 1
       this.getParams.minPrice = newRoute.query.minPrice ? parseInt(newRoute.query.minPrice) : -1

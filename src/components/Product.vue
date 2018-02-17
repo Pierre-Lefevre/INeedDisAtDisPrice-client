@@ -140,7 +140,7 @@ export default {
   methods: {
     ...mapGetters(['getUser']),
     fetchProducts () {
-      axios.get(this.$store.state.serverUrl + '/api/product/' + this.productId).then(response => {
+      axios.get(this.$store.state.serverUrl + '/api/product?id=' + this.productId).then(response => {
         this.product = response.data.product
         this.similarProducts = response.data.similarProducts
       }, error => {
@@ -149,8 +149,6 @@ export default {
     },
     createAlert () {
       this.showModal = false
-
-      console.log(this.alertPrice)
 
       let data = JSON.stringify({
         id_user: this.getUser()._id,
