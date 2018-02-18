@@ -2,7 +2,7 @@
   <div id="products-wrapper">
     <div id="filter">
       <div id="price-filter">
-        <p>Prix : </p>
+        <p>Prix&nbsp;:</p>
         <span>
           <template v-if="parseInt(getParams.minPrice) < parseInt(getParams.maxPrice)">{{ getParams.minPrice }}</template>
           <template v-else>{{ getParams.maxPrice }}</template>
@@ -249,13 +249,14 @@ export default {
       }
 
       span {
-        width: 50px;
+        margin: 0 10px;
         text-align: center;
       }
 
       .range-slider {
         position: relative;
-        width: 200px;
+        max-width: 200px;
+        width: 100%;
         height: 35px;
         text-align: center;
         display: flex;
@@ -267,7 +268,8 @@ export default {
           overflow: hidden;
           top: 0;
           bottom: 0;
-          width: 200px;
+          max-width: 200px;
+          width: 100%;
           outline: none;
           height: 18px;
           margin: auto;
@@ -422,5 +424,76 @@ export default {
   .no-product {
     display: flex;
     justify-content: center
+  }
+
+  @media screen and (min-width: 501px) and (max-width: 900px) {
+    #products-list li {
+      width: calc((100% + 2px) / 3);
+
+      &:nth-child(4n+1) {
+        margin-left: -1px;
+        transform-origin: initial;
+      }
+
+      &:nth-child(4n+4) {
+        transform-origin: initial;
+      }
+
+      &:nth-child(3n+1) {
+        margin-left: 0;
+        transform-origin: left center;
+      }
+
+      &:nth-child(3n+3) {
+        transform-origin: right center;
+      }
+    }
+  }
+
+  @media screen and (min-width: 301px) and (max-width: 500px) {
+    #products-list li {
+      width: calc((100% + 1px) / 2);
+
+      &:nth-child(3n+1) {
+        margin-left: -1px;
+        transform-origin: initial;
+      }
+
+      &:nth-child(3n+3) {
+        transform-origin: initial;
+      }
+
+      &:nth-child(2n+1) {
+        margin-left: 0;
+        transform-origin: left center;
+      }
+
+      &:nth-child(2n+2) {
+        transform-origin: right center;
+      }
+    }
+  }
+
+  @media screen and (max-width: 300px) {
+    #products-list li {
+      width: 100%;
+
+      &:nth-child(2n+1) {
+        margin-left: -1px;
+        transform-origin: initial;
+      }
+
+      &:nth-child(2n+2) {
+        transform-origin: initial;
+      }
+
+      &:nth-child(1n+1) {
+        margin-left: 0;
+      }
+
+      &:hover {
+        transform: initial;
+      }
+    }
   }
 </style>

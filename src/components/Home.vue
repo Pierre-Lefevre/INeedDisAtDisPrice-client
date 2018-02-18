@@ -30,13 +30,13 @@ export default {
 
     h1 {
       font-size: 6rem;
-      margin-bottom: 20px;
+      margin: 0 20px 20px 20px;
       text-align: center;
     }
 
     h2 {
       font-size: 2rem;
-      margin-top: 20px;
+      margin: 20px;
       text-align: center;
     }
   }

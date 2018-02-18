@@ -81,17 +81,25 @@ export default {
     }
   }
 
-  .home > form {
-    margin: 10px;
+  .home {
+    width: 100%;
+    justify-content: center;
 
-    input[type='text'] {
-      background-color: $black-opacity;
-      font-size: 1.5rem;
-      width: 300px;
-    }
+    form {
+      margin: 0 20px 0 20px;
+      max-width: 400px;
+      width: 100%;
+      display: flex;
 
-    button {
-      background: $black-opacity url('/static/img/icons/search.png') no-repeat center center;
+      input[type='text'] {
+        background-color: $black-opacity;
+        font-size: 1.5rem;
+        flex: 1;
+      }
+
+      button {
+        background: $black-opacity url('/static/img/icons/search.png') no-repeat center center;
+      }
     }
   }
 
